@@ -1,0 +1,24 @@
+{
+  "name": "hypervisor-ui",
+  "version": "1.0.0",
+  "description": "Powerful virtualization platform",
+  "author": "Bharat Bala",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate"
+  },
+  "dependencies": {
+    "@fortawesome/vue-fontawesome": "^0.1.9",
+    "@nuxtjs/auth": "^4.8.5",
+    "@nuxtjs/axios": "^5.9.5",
+    "accounting": "^0.4.1",
+    "chart.js": "^2.9.4",
+    "ioredis": "^4.16.0",
+    "nuxt": "^2.14.4",
+    "vue-chartkick": "^0.6.1"
+  },
+  "devDependencies": {}
+}
