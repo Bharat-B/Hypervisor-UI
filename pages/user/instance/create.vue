@@ -272,10 +272,10 @@ export default {
 		let imageresponse = await $axios.get('user/images').catch((error) => {
 		});
 		imageresponse.data.data.forEach((image) => {
-			if (!images[image.distro]) {
-				images[image.distro] = [];
+			if (!images[image.distro.short_name]) {
+				images[image.distro.short_name] = [];
 			}
-			images[image.distro].push(image);
+			images[image.distro.short_name].push(image);
 			all_images.push(image);
 		});
 		if (imageresponse.data.last_page !== 1) {
@@ -283,10 +283,10 @@ export default {
 				imageresponse = await $axios.get('user/images', {params: {page: i}}).catch((error) => {
 				});
 				imageresponse.data.data.forEach((image) => {
-					if (!images[image.distro]) {
-						images[image.distro] = [];
+					if (!images[image.distro.short_name]) {
+						images[image.distro.short_name] = [];
 					}
-					images[image.distro].push(image);
+					images[image.distro.short_name].push(image);
 					all_images.push(image);
 				});
 			}
@@ -385,9 +385,9 @@ export default {
 	},
 	methods: {
 		selectImage(image) {
-			this.$set(this, 'image_distro', image.distro);
+			this.$set(this, 'image_distro', image.distro.short_name);
 			this.$set(this, 'image_id', image.id);
-			$('#' + image.distro + '-image_name').text(image.name);
+			$('#' + image.distro.short_name + '-image_name').text(image.name);
 			this.$set(this, 'iso_distro', null);
 			this.$set(this, 'iso_id', null);
 		},

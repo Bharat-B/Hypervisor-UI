@@ -1220,7 +1220,7 @@ export default {
 
 		instance_location() {
 			if (this.instance.hypervisor.region_id !== '') {
-				if (this.instance.hypervisor.region.length !== 0) {
+				if (this.instance.hypervisor.region && this.instance.hypervisor.region.length !== 0) {
 					return this.instance.hypervisor.region[0].name + ', ' + this.instance.hypervisor.region[0].country
 				}
 			}

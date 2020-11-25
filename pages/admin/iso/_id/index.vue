@@ -32,6 +32,15 @@
 							<span class="help-block" v-if="errors.distro">{{ errors.distro[0] }}</span>
 						</div>
 					</div>
+					<div class="form-group row"  :class="{'has-error': errors.user_id}">
+						<div class="col-md-2">
+							<h5>User:</h5>
+						</div>
+						<div class="col-md-4">
+							<select2 v-bind:name="'user_id'" v-bind:allowclear="'true'" data-width="100%" v-once></select2>
+							<span class="help-block" v-if="errors.user_id">{{ errors.user_id[0] }}</span>
+						</div>
+					</div>
 					<div class="row">
 						<div class="col-md-2"></div>
 						<div class="col-md-4">
@@ -48,8 +57,13 @@
 	</div>
 </template>
 <script>
+import Select2 from "@/components/bootstrap/select2";
+
 export default {
 	layout: 'admin',
+	components: {
+		'select2': Select2
+	},
 	head: {
 		title: 'Edit ISO'
 	},
@@ -78,7 +92,7 @@ export default {
 	},
 	mounted() {
 		let vm = this;
-		let distro = [];
+		let distro = [], user = [];
 		if (vm.iso.distro !== '' && this.$store.state.global.environment.distros[this.iso.distro].short_name) {
 			distro.push({
 				id: vm.iso.distro,
@@ -87,6 +101,43 @@ export default {
 				selected: true
 			});
 		}
+		if(vm.iso.user){
+			user.push({
+				id: vm.iso.user_id,
+				text: [vm.iso.user.first_name, vm.iso.user.last_name].join(' '),
+				user: vm.iso.user,
+				selected: true
+			})
+		}
+		$('[name="user_id"]').select2({
+			placeholder: 'Select User',
+			ajax: {
+				url: vm.$axios.defaults.baseURL + '/admin/users',
+				headers: {
+					"Authorization": window.localStorage.getItem('auth._token.local'),
+					"X-Requested-With": 'XMLHttpRequest',
+					"Content-Type": "application/json",
+				},
+				dataType: 'json',
+				delay: 250,
+				data: function (params) {
+					return {
+						search: $.trim(params.term),
+					}
+				},
+				processResults: function (data) {
+					let users = [];
+					data.data.forEach((user) => {
+						users.push({id: user.id, text: [user.first_name, user.last_name].join(' '), user: user});
+					});
+					return {
+						results: users
+					}
+				},
+				cache: true
+			},
+			data: user
+		});
 		$('[name="distro"]').select2({
 			placeholder: 'Select Distro',
 			ajax: {

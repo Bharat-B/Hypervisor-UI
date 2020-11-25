@@ -1,7 +1,7 @@
 <template>
 	<div class="content animated fadeIn">
 		<h2><i class="fa fa-compact-disc" aria-hidden="true"></i> ISO(s)</h2>
-		<div class="col-md-10 email isos">
+		<div class="col-md-12 email isos">
 			<div class="box">
 				<div class="input-group">
 					<input type="text" class="form-control" placeholder="Search.." v-model="iso_pagination.search"
