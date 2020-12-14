@@ -10,6 +10,13 @@
 						<input type="text" class="form-control input-lg" name="token" required="" autofocus=""/>
 					</div>
 					<br>
+					<button class="btn btn-lg btn-primary btn-block" href="#" @click.prevent="cancel_masquerade" v-if="is_admin">
+						<i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+						<span class="nav-text">
+							Back to Admin
+						</span>
+					</button>
+					<br>
 					<button class="btn btn-lg btn-primary btn-block" :class="{'disabled': processing}" type="submit"
 							:disabled="processing">
 						<i class="fas" :class="{'fa-sign-in-alt': !processing, 'fa-spinner fa-spin': processing}"
@@ -32,6 +39,7 @@ export default {
 		return {
 			processing: false,
 			dashboard: false,
+			is_admin: false
 		}
 	},
 	head: {
@@ -62,12 +70,23 @@ export default {
 		}
 	},
 	methods: {
+		async cancel_masquerade(){
+			let vm = this;
+			let admin_token = window.localStorage.getItem('auth.admin_token');
+			await this.$axios.post('/user/token/invalidate',{
+				token: vm.$auth.getToken('local')
+			}).catch((error)=>{});
+			vm.$auth.setToken('local',admin_token);
+			setTimeout(()=>{
+				window.localStorage.removeItem('auth.admin_token');
+				window.location.reload();
+			},1000);
+		},
 		async authenticate(refresh = true) {
 			let vm = this;
 			vm.$set(vm,'processing',true);
 			let response = await vm.$axios.post('/auth/mfa', {
-				token: $('[name="token"]').val(),
-				admin_token: window.localStorage.getItem('auth.admin_token') || false
+				token: $('[name="token"]').val()
 			}).catch((error) => {
 				vm.$set(vm,'processing',false);
 			});
@@ -82,14 +101,14 @@ export default {
 	mounted() {
 		if(this.$store.getters.user.authenticated_mfa === 1){
 			if(this.$store.getters.user.role_id === 1){
-				this.$router.push({name: 'user-dashboard'});
+				this.$router.push({name: 'admin-dashboard'});
 			} else {
 				this.$router.push({name: 'user-dashboard'});
 			}
 		}
-		let admin_token = window.localStorage.getItem('auth.admin_token') || false;
-		if (admin_token && this.$store.getters.user.role_id === 3 && this.$store.getters.user.mfa === 1 && this.$store.getters.user.authenticated_mfa !== 1) {
-			this.authenticate(false);
+		let token = window.localStorage.getItem('auth.admin_token') || undefined;
+		if(token !== undefined){
+			this.$set(this,'is_admin', true);
 		}
 	},
 }

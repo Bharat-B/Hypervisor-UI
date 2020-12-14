@@ -5,6 +5,14 @@
             <a class="animated fadeIn logo"><img  src="/logo.png"/></a>
         </div>
         <ul>
+			<li class="has-subnav" v-if="is_reseller">
+				<nuxt-link :to="{name: 'user-subusers'}">
+					<i class="fa fa-users" aria-hidden="true"></i>
+					<span class="nav-text">
+                        Subusers
+                    </span>
+				</nuxt-link>
+			</li>
             <li class="has-subnav">
                 <nuxt-link :to="{name: 'user-dashboard'}">
                     <i class="fa fa-server" aria-hidden="true"></i>
@@ -41,7 +49,7 @@
                 <nuxt-link :to="{name: 'user-ssh-keys'}" href="/user/ssh-keys">
                     <i class="fa fa-lock famore" aria-hidden="true"></i>
                     <span class="nav-text">
-                             SSH Keys
+						SSH Keys
                     </span>
                 </nuxt-link>
             </li>
@@ -53,6 +61,14 @@
                     </span>
                 </nuxt-link>
             </li>
+			<li>
+				<nuxt-link :to="{name: 'user-snapshots'}" href="/user/snapshots">
+					<i class="fa fa-camera-retro" aria-hidden="true"></i>
+					<span class="nav-text">
+						Snapshots
+					</span>
+				</nuxt-link>
+			</li>
         </ul>
         <ul class="users">
             <li>

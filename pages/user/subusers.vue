@@ -1,9 +1,8 @@
 <template>
 	<div class="dashcontent">
-		<h1><i class="fa fa-terminal famore" aria-hidden="true"></i> SSH Keys</h1>
+		<h1><i class="fa fa-users" aria-hidden="true"></i> Subusers</h1>
 		<div class="dropdown manybtn">
-			<button class="dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true"
-					aria-expanded="false">
+			<button class="dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				<i class="fa fa-plus-circle" aria-hidden="true"></i> Create
 				<span class="caret"></span>
 			</button>
@@ -21,7 +20,7 @@
 					<nuxt-link :to="{name: 'user-firewall-create'}">New Firewall</nuxt-link>
 				</li>
 				<li>
-					<nuxt-link :to="{name: 'user-recipe-create'}">New Recipe</nuxt-link>
+					<nuxt-link :to="{name: 'user-snapshot-create'}">New snapshot</nuxt-link>
 				</li>
 				<li>
 					<nuxt-link :to="{name: 'user-ssh-key-create'}">New SSH Key</nuxt-link>
@@ -30,49 +29,40 @@
 		</div>
 		<div class="dashstuff">
 			<div class="col-md-10">
-				<div class="wow fadeIn blocks firewall-manage recipes" v-if="keys.data.length >= 1">
-					<input type="search" placeholder="Search Keys" v-model="pagination_search" @keyup.enter="search"/>
+				<div class="wow fadeIn blocks firewall-manage snapshots" v-if="subusers.data.length >= 1">
+					<input type="search" placeholder="Search User" v-model="pagination_search" @keyup.enter="search"/>
 					<div class="table-responsive">
-						<table class="table recipeslist">
+						<table class="table snapshotslist">
 							<thead>
 							<tr>
 								<th>Name</th>
+								<th>Email</th>
+								<th>Status</th>
 								<th>Data created</th>
 								<th></th>
 							</tr>
 							</thead>
 							<tbody>
-							<tr v-for="key in keys.data">
+							<tr v-for="subuser in subusers.data">
+								<td>{{ subuser.first_name }} {{ subuser.last_name }}</td>
+								<td>{{ subuser.email }}</td>
 								<td>
-									<nuxt-link :to="{ name: 'user-ssh-key-id', params: {id: key.id} }"><p>{{
-											key.name
-										}}</p></nuxt-link>
+									<div class="status" :class="{active: subuser.status === 1, inactive: subuser.status === 0, suspended: subuser.status === 2}"></div>
 								</td>
-								<td><p>{{ key.created_at }}</p></td>
-								<td>
-									<nuxt-link :to="{ name: 'user-ssh-key-id', params: {id: key.id} }">
-										<button class="btn btn-default"><i class="fa fa-terminal famore"
-																		   aria-hidden="true"></i> Edit
-										</button>
-									</nuxt-link>
-									<button class="btn btn-default" @click.prevent="destroy(key.id)"><i
-										class="fa fa-trash" aria-hidden="true"></i></button>
+								<td>{{ subuser.created_at }}</td>
+								<td class="actions">
+									<button class="btn btn-default" @click.prevent="destroy(subuser.id)" :disabled="subuser.email === user.email">
+										<i class="fa fa-trash" aria-hidden="true"></i>
+									</button>
 								</td>
 							</tr>
 							</tbody>
 						</table>
 					</div>
-					<pagination :search="pagination_search" :pagination="keys" @paginate="page"></pagination>
+					<pagination :search="pagination_search" :pagination="subusers" @paginate="page"></pagination>
 				</div>
-				<div class="wow fadeIn blocks firewall-manage recipes" v-if="keys.data.length <= 0">
-					<h1 class="text-center">No SSH Keys created!</h1>
-					<div class="text-center">
-						<nuxt-link to="/user/ssh-key/create">
-							<button class="btn btn-primary normal">
-								<i class="fa fa-plus-circle" aria-hidden="true"></i> Add New
-							</button>
-						</nuxt-link>
-					</div>
+				<div class="wow fadeIn blocks firewall-manage snapshots" v-else>
+					<h1 class="text-center">No users created!</h1>
 				</div>
 			</div>
 		</div>
@@ -84,7 +74,7 @@ import pagination from '~/components/pagination.vue'
 export default {
 	watchQuery: true,
 	head: {
-		title: 'SSH Keys'
+		title: 'Sub Users'
 	},
 	components: {
 		pagination
@@ -92,10 +82,10 @@ export default {
 	layout: 'user',
 	data() {
 		return {
-			getRoute: "user/ssh-keys",
+			getRoute: "user/reseller/subusers",
 			pagination_search: "",
 			pagination_store: {no: 1, items: 20},
-			keys: {
+			subusers: {
 				total: 0,
 				data: []
 			}
@@ -110,7 +100,7 @@ export default {
 		if (route.query && route.query.search !== '') {
 			pagination_search = route.query.search;
 		}
-		return $axios.get('user/ssh-keys', {
+		return $axios.get('user/reseller/subusers', {
 			params: {
 				page: pagination_store.no,
 				per_page: pagination_store.items,
@@ -118,10 +108,10 @@ export default {
 			}
 		}).then((response) => {
 			return {
-				keys: response.data,
+				subusers: response.data,
 				pagination_search: pagination_search,
 				pagination_store: pagination_store,
-				getRoute: "user/ssh-keys"
+				getRoute: "user/reseller/subusers"
 			}
 		}).catch((error) => {
 
@@ -147,11 +137,14 @@ export default {
 			})
 		},
 		destroy(id) {
-			this.$axios.delete('user/ssh-key/' + id).then((response) => {
-
+			let vm = this;
+			vm.$axios.delete('user/reseller/subuser/' + id).then((response) => {
+				setTimeout(() => {
+					vm.search();
+				},2000);
 			}).catch((error) => {
 
-			})
+			});
 		}
 	}
 }

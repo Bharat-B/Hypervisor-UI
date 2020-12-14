@@ -138,11 +138,14 @@ export default {
 	},
 	mounted() {
 		let vm = this;
-		$('[name="disk_type"]').select2({placeholder: 'Select Disk'});
-		$('[name="format"]').select2({placeholder: 'Select Format'});
-		$('[name="type"]').select2({placeholder: 'Select Type'}).on('change', function () {
-			vm.type = this.value;
-			return true;
+		$('[name="disk_type"]').select2({placeholder: 'Select Disk'}).change(function(){
+			vm.$set(vm,"disk",this.value);
+		});
+		$('[name="format"]').select2({placeholder: 'Select Format'}).change(function(){
+			vm.$set(vm,"format",this.value);
+		});
+		$('[name="type"]').select2({placeholder: 'Select Type'}).change(function(){
+			vm.$set(vm,"type",this.value);
 		});
 		$('[name="hypervisor_id"]').select2({
 			placeholder: 'Select Hypervisor',

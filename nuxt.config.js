@@ -127,7 +127,7 @@ export default {
     ** Server configuration
      */
     server: {
-        port: process.env.PORT || 3000, // default: 3000
+        port: 3000, // default: 3000
         host: process.env.IPADDR || '127.0.0.1' // default: localhost
     }
 }

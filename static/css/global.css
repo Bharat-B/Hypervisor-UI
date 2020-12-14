@@ -3249,11 +3249,15 @@ tbody.collapse.in{
 	clip:rect(0,0,0,0);
 	pointer-events:none
 }
+.snapshotslist .input-group {
+	display:block;
+}
 .input-group{
 	position:relative;
 	display:table;
 	border-collapse:separate
 }
+
 .input-group[class*=col-]{
 	float:none;
 	padding-right:0;
@@ -3297,6 +3301,13 @@ select.input-group-sm>.form-control,select.input-group-sm>.input-group-addon,sel
 select[multiple].input-group-sm>.form-control,select[multiple].input-group-sm>.input-group-addon,select[multiple].input-group-sm>.input-group-btn>.btn,textarea.input-group-sm>.form-control,textarea.input-group-sm>.input-group-addon,textarea.input-group-sm>.input-group-btn>.btn{
 	height:auto
 }
+.snapshotslist .input-group-addon {
+	padding: 0px;
+}
+.snapshotslist .input-group-addon, .snapshotslist .input-group-btn {
+	display: block;
+}
+
 .input-group .form-control,.input-group-addon,.input-group-btn{
 	display:table-cell
 }
@@ -6470,7 +6481,7 @@ nav ul,nav li {
 	max-width: 1900px;
 }
 .instance-s .tab-pane {
-	min-width: 67% !important;
+	min-width: 70% !important;
 	padding-bottom: 77px !important;
 }
 .instance-s .btn-default {
@@ -6550,6 +6561,17 @@ nav ul,nav li {
 .instance-s .stat {
 	text-align: center;
 }
+
+.instance-s #snapshots .btn-success {
+	padding: 15px 26px 15px 26px;
+	border-radius: 2px;
+	background-color: #56B066;
+	transition: all .2s ease;
+	margin-top: 25px;
+	outline: 0px;
+	border-color: transparent;
+}
+
 .instance-s #settings .btn-success {
 	padding: 15px 26px 15px 26px;
 	border-radius: 2px;
@@ -6692,10 +6714,7 @@ nav ul,nav li {
 	box-shadow: none !important;
 	outline: 0px !important;
 }
-#settings input[type=search] {
-	margin-left:-13px;
-	transition: all .1s ease;
-}
+
 #settings input[type=search]:hover, #settings input[type=search]:focus {
 	transition: all .1s ease;
 }
@@ -6965,12 +6984,12 @@ td > .select2.select2-container {
 }
 
 .select2.select2-container .select2-selection--multiple {
-	/*height: auto;
-    min-height: 34px;*/
+	height: auto;
 }
 
 .select2.select2-container .select2-selection--multiple .select2-search--inline .select2-search__field {
 	margin-top: 0;
+	margin-left: 10px;
 	height: 32px;
 }
 
@@ -8018,4 +8037,25 @@ td > .select2.select2-container {
 
 .progress-bar.active,.progress.active .progress-bar{
 	background-color: #3D3487;
+}
+
+.snapshots .status {
+	margin-top: 4px !important;
+	height: 21px;
+	width: 21px;
+	background-color: #bbb;
+	border-radius: 50%;
+	display: inline-block;
+}
+.status.on {
+	background-color: rgba(61, 51, 134, 0.9);
+}
+.status.active {
+	background-color: rgba(64, 179, 108, 0.9);
+}
+.status.inactive {
+	background-color: rgba(255, 94, 94, 0.9);
+}
+.status.suspended {
+	background-color: #CACACA;
 }

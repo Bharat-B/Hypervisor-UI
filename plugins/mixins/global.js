@@ -16,7 +16,7 @@ const Global = {
                     stateList: state => state.global.stateList,
                     currencySymbol: state => state.global.currencySymbol,
                     countryStates: state => state.global.countryStates,
-                    enabledBilling: (state) => { return state.global.environment.settings.enable_billing == '1' },
+                    enabledBilling: (state) => { return state.global.environment.settings.enable_billing === '1' },
                     is_reseller: (state) => { return state.auth.user.is_reseller === 1 }
                 }),
                 ...mapGetters({

@@ -4,8 +4,7 @@
 		<div class="col-md-12 email instances">
 			<div class="box">
 				<div class="input-group">
-					<input v-model="instance_pagination.search" class="form-control" placeholder="Search.." type="text"
-						   @keyup.enter="search">
+					<input v-model="instance_pagination.search" class="form-control" placeholder="Search.." type="text" @keyup.enter="search">
 				</div>
 				<div class="createit">
 					<nuxt-link :to="{name: 'admin-instance-create'}" class="btn btn-primary" tag="a"><i
@@ -58,78 +57,61 @@
 								</label>
 							</td>
 							<td>
-								<span v-if="instance.created === 1 && !instance.running_task" :class="{'label-success': is_running(instance) && !is_suspended(instance),'label-danger': is_stopped(instance) && !is_suspended(instance),'label-default': unknown_suspended_state(instance),'label-warning': is_suspended (instance) || is_network_suspended(instance)}" class="label">
-									{{ instance_status(instance) }}
+								<span v-if="instance.running_task">
+									<label v-if="( instance.created === 0 || instance.created === 1 )">
+										<span v-for="task in instance.tasks" v-if="['done','failed'].indexOf(task.status) === -1" class="label label-info">
+											<i class="fa fa-spin fa-spinner"></i> {{ tasks[task.action] }}
+										</span>
+									</label>
+									<label v-else-if="is_migrating(instance)" class="label label-info"><i class="fa fa-spin fa-spinner"></i> Migrating</label>
 								</span>
-								<span v-else-if="( instance.created === 0 || instance.created === 1 ) && instance.running_task">
-									<span v-for="task in instance.tasks" v-if="['done','failed'].indexOf(task.status) === -1" class="label label-info">
-										<i class="fa fa-spin fa-spinner"></i> {{ tasks[task.action] }}
-									</span>
+								<span v-else>
+									<label v-if="instance.created === 1" :class="{'label-success': is_running(instance) && !is_suspended(instance),'label-danger': is_stopped(instance) && !is_suspended(instance),'label-default': unknown_suspended_state(instance),'label-warning': is_suspended (instance) || is_network_suspended(instance)}" class="label">
+										{{ instance_status(instance) }}
+									</label>
+									<label v-else-if="instance.created === 0 && !instance.running_task" class="label label-danger">Deploy Failed</label>
+									<label v-else class="label label-info"><i class="fa fa-spin fa-spinner"></i> Retrieving Status</label>
 								</span>
-								<span v-else-if="instance.created === 0 && !instance.running_task" class="label label-danger">Deploy Failed</span>
-								<span v-else-if="is_migrating(instance)" class="label label-info"><i class="fa fa-spin fa-spinner"></i> Migrating</span>
-								<span v-else class="label label-info"><i class="fa fa-spin fa-spinner"></i> Retrieving Status</span>
 							</td>
 							<td>{{ instance.name }}</td>
 							<td>{{ instance.hostname }}</td>
 							<td>{{ instance.ips.length >= 1 && instance.primary_ip.length >= 1 ? instance.primary_ip[0].ip : '' }}</td>
 							<td><img :src="'/assets/'+instance.os_distro+'.png'" style="height:32px;width:32px"/></td>
 							<td>{{ instance.hypervisor ? instance.hypervisor.name : '' }}</td>
-							<td>{{ instance.user ? instance.user.email : '' }}</td>
+							<td>{{ instance.user ? instance.user.email : '' }} <a @click.prevent="masquerade(instance.user_id)" style="cursor: pointer"><i class="fas fa-sign-out-alt" aria-hidden="true"></i></a></td>
 							<td>
-								<nuxt-link :disabled="instance.processing"
-										   :to="{name: 'admin-instance-id', params: {id: instance.id}}"
-										   class="btn btn-default" data-placement="bottom" data-title="Edit"
-										   data-toggle="tooltip" tag="a"><i class="fa fa-edit"></i></nuxt-link>
-								<nuxt-link :disabled="instance.processing"
-										   :to="{name: 'admin-instance-id-manage', params: {id: instance.id}}"
-										   class="btn btn-default" data-placement="bottom" data-title="Manage"
-										   data-toggle="tooltip" tag="a"><i class="fa fa-cog"></i></nuxt-link>
+								<nuxt-link :disabled="instance.processing" :to="{name: 'admin-instance-id', params: {id: instance.id}}" class="btn btn-default" data-placement="bottom" data-title="Edit" data-toggle="tooltip" tag="a">
+									<i class="fa fa-edit"></i>
+								</nuxt-link>
+								<nuxt-link :disabled="instance.processing" :to="{name: 'admin-instance-id-manage', params: {id: instance.id}}" class="btn btn-default" data-placement="bottom" data-title="Manage" data-toggle="tooltip" tag="a">
+									<i class="fa fa-cog"></i>
+								</nuxt-link>
 							</td>
 							<td class="actions responsiveness">
-								<button v-if="is_stopped(instance) && !is_suspended(instance) && !is_network_suspended(instance)"
-									:disabled="instance.processing || instance.running_task || is_migrating(instance)" class="btn btn-default"
-									data-placement="bottom" data-title="Start" data-toggle="tooltip"
-									@click.prevent="action('start', instance, $index)"><i class="fa fa-power-off"
-																						  style="color: #56A26C"></i>
+								<button v-if="is_stopped(instance) && !is_suspended(instance) && !is_network_suspended(instance)" :disabled="instance.processing || instance.running_task || is_migrating(instance)" class="btn btn-default" data-placement="bottom" data-title="Start" data-toggle="tooltip" @click.prevent="action('start', instance, $index)">
+									<i class="fa fa-power-off" style="color: #56A26C"></i>
 								</button>
-								<button v-if="is_running(instance) && !is_suspended(instance)"
-										:disabled="instance.processing || instance.running_task || is_migrating(instance)" class="btn btn-default"
-										data-placement="bottom" data-title="Suspend" data-toggle="tooltip"
-										@click.prevent="action('suspend', instance, $index)"><i class="fa fa-pause"></i>
+								<button v-if="is_running(instance) && !is_suspended(instance)" :disabled="instance.processing || instance.running_task || is_migrating(instance)" class="btn btn-default" data-placement="bottom" data-title="Suspend" data-toggle="tooltip" @click.prevent="action('suspend', instance, $index)">
+									<i class="fa fa-pause"></i>
 								</button>
-								<button v-if="is_running(instance) && !is_suspended(instance) && !is_network_suspended(instance)"
-									:disabled="instance.processing || instance.running_task || is_migrating(instance)" class="btn btn-default"
-									data-placement="bottom" data-title="Shutdown" data-toggle="tooltip"
-									@click.prevent="action('shutdown', instance, $index)"><i class="fa fa-stop"
-																							 style="color: #c9302c"></i>
+								<button v-if="is_running(instance) && !is_suspended(instance) && !is_network_suspended(instance)" :disabled="instance.processing || instance.running_task || is_migrating(instance)" class="btn btn-default" data-placement="bottom" data-title="Shutdown" data-toggle="tooltip" @click.prevent="action('shutdown', instance, $index)">
+									<i class="fa fa-stop" style="color: #c9302c"></i>
 								</button>
-								<button v-if="!is_suspended(instance) && !is_network_suspended(instance)"
-										:disabled="instance.processing || instance.running_task || is_migrating(instance)" class="btn btn-default"
-										data-placement="bottom" data-title="Restart" data-toggle="tooltip"
-										@click.prevent="action('restart', instance, $index)"><i class="fa fa-sync"
-																								style="color: #31b0d5"></i>
+								<button v-if="!is_suspended(instance) && !is_network_suspended(instance)" :disabled="instance.processing || instance.running_task || is_migrating(instance)" class="btn btn-default" data-placement="bottom" data-title="Restart" data-toggle="tooltip" @click.prevent="action('restart', instance, $index)">
+									<i class="fa fa-sync" style="color: #31b0d5"></i>
 								</button>
-								<button v-if="is_running(instance) && !is_suspended(instance)"
-										:disabled="instance.processing || instance.running_task || is_migrating(instance)" class="btn btn-default"
-										data-placement="bottom" data-title="Power Off" data-toggle="tooltip"
-										@click.prevent="action('stop', instance, $index)"><i class="fa fa-power-off"
-																							 style="color: #c9302c"></i>
+								<button v-if="is_running(instance) && !is_suspended(instance)" :disabled="instance.processing || instance.running_task || is_migrating(instance)" class="btn btn-default" data-placement="bottom" data-title="Power Off" data-toggle="tooltip" @click.prevent="action('stop', instance, $index)">
+									<i class="fa fa-power-off" style="color: #c9302c"></i>
 								</button>
-								<button v-if="is_suspended(instance)"
-										:disabled="instance.processing || instance.running_task || is_migrating(instance)" class="btn btn-default"
-										data-placement="bottom" data-title="Resume" data-toggle="tooltip"
-										@click.prevent="action('resume', instance, $index)"><i class="fa fa-play"
-																							   style="color: #56A26C"></i>
+								<button v-if="is_suspended(instance)" :disabled="instance.processing || instance.running_task || is_migrating(instance)" class="btn btn-default" data-placement="bottom" data-title="Resume" data-toggle="tooltip" @click.prevent="action('resume', instance, $index)">
+									<i class="fa fa-play" style="color: #56A26C"></i>
 								</button>
-								<button class="btn btn-default" data-placement="bottom" data-title="Open Console"
-										data-toggle="tooltip" @click.prevent="novnc(instance)"><i aria-hidden="true"
-																								  class="fa fa-terminal"></i>
+								<button class="btn btn-default" data-placement="bottom" data-title="Open Console" data-toggle="tooltip" @click.prevent="novnc(instance)">
+									<i aria-hidden="true" class="fa fa-terminal"></i>
 								</button>
-								<button :disabled="instance.processing || instance.running_task || is_migrating(instance)" class="btn btn-default"
-										data-placement="bottom" data-title="Destroy" data-toggle="tooltip"
-										@click.prevent="destroy(instance, $index)"><i aria-hidden="true"
-																					  class="fa fa-trash"></i></button>
+								<button :disabled="instance.processing || instance.running_task || is_migrating(instance)" class="btn btn-default" data-placement="bottom" data-title="Destroy" data-toggle="tooltip" @click.prevent="destroy(instance, $index)">
+									<i aria-hidden="true" class="fa fa-trash"></i>
+								</button>
 							</td>
 						</tr>
 						</tbody>
@@ -150,27 +132,18 @@
 						</select>
 					</div>
 					<div class="btn-group dropup">
-						<button aria-expanded="false" aria-haspopup="true" class="btn btn-default dropdown-toggle"
-								data-toggle="dropdown"
-								type="button"> {{ instance_pagination.per_page }} entries
+						<button aria-expanded="false" aria-haspopup="true" class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">
+							{{ instance_pagination.per_page }} entries
 						</button>
 						<ul class="dropdown-menu">
-							<li :class="{active: instance_pagination.per_page === 20}"><a href="#"
-																						  @click.prevent="$set($data.instance_pagination,'per_page',20)">20
-								entries</a></li>
-							<li :class="{active: instance_pagination.per_page === 50}"><a href="#"
-																						  @click.prevent="$set($data.instance_pagination,'per_page',50)">50
-								entries</a></li>
-							<li :class="{active: instance_pagination.per_page === 100}"><a href="#"
-																						   @click.prevent="$set($data.instance_pagination,'per_page',100)">100
-								entries</a></li>
+							<li :class="{active: instance_pagination.per_page === 20}"><a href="#" @click.prevent="$set($data.instance_pagination,'per_page',20)">20 entries</a></li>
+							<li :class="{active: instance_pagination.per_page === 50}"><a href="#" @click.prevent="$set($data.instance_pagination,'per_page',50)">50 entries</a></li>
+							<li :class="{active: instance_pagination.per_page === 100}"><a href="#" @click.prevent="$set($data.instance_pagination,'per_page',100)">100 entries</a></li>
 						</ul>
 					</div>
 					<div class="btn-group dropup">
-						<button aria-expanded="false" aria-haspopup="true" class="btn btn-default dropdown-toggle"
-								data-toggle="dropdown"
-								type="button"> Page {{ instance_pagination.instances.current_page }}
-							<i aria-hidden="true" class="fa fa-arrow-circle-up"></i>
+						<button aria-expanded="false" aria-haspopup="true" class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">
+							Page {{ instance_pagination.instances.current_page }} <i aria-hidden="true" class="fa fa-arrow-circle-up"></i>
 						</button>
 						<ul class="dropdown-menu">
 							<li v-for="i in $pageRange(instance_pagination.instances.last_page)">
@@ -236,7 +209,8 @@ export default {
 				restart_instance: 'Rebooting',
 				destroy_instance: 'Destroying',
 				resume_instance: 'Resuming',
-				suspend_instance: 'Suspending'
+				suspend_instance: 'Suspending',
+				create_snapshot: 'Creating Snapshot'
 			},
 			initiated: [],
 			selected_instances: [],
@@ -271,6 +245,18 @@ export default {
 				x.document.open();
 				x.document.write(response.data);
 				x.document.close();
+			});
+		},
+		masquerade(id) {
+			let vm = this;
+			vm.$axios.post('/admin/user/' + id + '/login').then((response) => {
+				if (response.data.success) {
+					window.localStorage.setItem('auth.admin_token', vm.$auth.getToken('local'));
+					vm.$auth.setToken('local', 'bearer ' + response.data.token);
+					window.location.reload();
+				}
+			}).catch((error) => {
+
 			});
 		},
 		destroy(instance, index) {
@@ -393,9 +379,7 @@ export default {
 			if (result && result.data.task_id) {
 				this.initiated.push(result.data.task_id);
 			}
-			setTimeout(() => {
-				this.get_instances();
-			}, 1000);
+			this.do_polling();
 		},
 
 		async get_instances() {
@@ -422,8 +406,6 @@ export default {
 				hypervisor_id: this.$route.query.hypervisor_id
 			});
 
-			this.do_polling();
-
 		},
 
 		ip_list(instance) {
@@ -438,8 +420,7 @@ export default {
 		},
 
 		do_polling() {
-			clearInterval(this.polling);
-			let vm = this, tasks = [];
+			let vm = this;
 			vm.instance_pagination.instances.data.forEach((instance, ik) => {
 				if (instance.tasks.length > 0) {
 					instance.tasks.forEach((task, tk) => {
@@ -456,26 +437,27 @@ export default {
 					})
 				}
 			});
+			clearInterval(vm.polling);
 			vm.polling = setInterval(() => {
-				vm.update_tasks();
-			}, 1000);
+				vm.update_tasks()
+			}, 10000);
 		},
 
 		async update_tasks() {
 			let vm = this, end = ['done', 'failed'];
 			if (vm.poll_tasks.length >= 1) {
-				let tasks = await vm.$axios.get('/admin/tasks', {params: {tasks: vm.poll_tasks.join(',')}}).catch((error) => {
+				let tasks = await vm.$axios.get('/admin/tasks', {
+					params: {
+						tasks: vm.poll_tasks.join(',')
+					}
+				}).catch((error) => {
+
 				});
 				tasks.data.forEach((task) => {
 					vm.instance_pagination.instances.data.forEach((instance, ik) => {
 						if (instance.id === task.instance_id) {
 							vm.poll_tasks.forEach(async (task_id) => {
 								if (task_id === task.id) {
-									vm.instance_pagination.instances.data[ik].tasks.forEach((domtask, domid) => {
-										if (domtask.id === task_id) {
-											vm.$set(vm.instance_pagination.instances.data[ik].tasks, domid, task);
-										}
-									});
 									if (end.indexOf(task.status) !== -1) {
 										if (task.status === 'failed') {
 											bootbox.alert("Instance " + instance.name + " - " + vm.tasks[task.action] + " " + task.status + "<br /><div class='col-md-12' style='overflow: scroll; height:200px;background-color: #000;'>" + task.message.toString().replace(/\n/g, "<br />") + "</div>");
@@ -483,19 +465,23 @@ export default {
 										setTimeout(async () => {
 											let response = await vm.$axios.get('/admin/instances/' + task.instance_id);
 											if (response) {
-												vm.poll_tasks.splice(vm.poll_tasks.indexOf(task_id), 1);
-												vm.$set(vm.instance_pagination.instances.data[ik], 'running_task', false);
-												vm.$set(vm.instance_pagination.instances.data, ik, response.data);
+												vm.instance_pagination.instances.data[ik].tasks.forEach((domtask, domid) => {
+													if (domtask.id === task_id) {
+														vm.$set(vm.instance_pagination.instances.data[ik].tasks, domid, task);
+														vm.poll_tasks.splice(vm.poll_tasks.indexOf(task_id), 1);
+														vm.$set(vm.instance_pagination.instances.data, ik, response.data);
+														vm.$set(vm.instance_pagination.instances.data[ik], 'running_task', false);
+													}
+												});
 											}
-										}, 3000)
+										}, 20000)
 									}
 								}
 							});
 						}
 					});
 				});
-			}
-			if (vm.poll_tasks.length <= 0) {
+			} else if (vm.poll_tasks.length <= 0) {
 				clearInterval(vm.polling);
 			}
 		},
@@ -537,9 +523,6 @@ export default {
 			hypervisor: hypervisor
 		}
 
-	},
-	beforeMount() {
-		this.do_polling();
 	},
 	mounted() {
 		let vm = this;
@@ -583,10 +566,12 @@ export default {
 		}).on('change', function () {
 			vm.$set(vm.filter, "hypervisor_id", this.value);
 		});
+		this.do_polling();
 	},
 	beforeDestroy() {
 		clearInterval(this.polling);
-		this.poll_tasks = [];
+		this.poll_tasks = null;
+		this.initiated = null;
 	}
 }
 </script>

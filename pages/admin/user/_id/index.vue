@@ -255,7 +255,7 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-md-6">
+						<div class="col-md-4">
 							<div class="form-group" :class="{'has-error': errors.instance_limit}">
 								<label><i class="fa fa-unlock-alt" aria-hidden="true"></i> Instance Limit</label>
 								<input type="number" name="instance_limit" class="form-control"
@@ -265,12 +265,20 @@
 									}}</span>
 							</div>
 						</div>
-						<div class="col-md-6">
+						<div class="col-md-4">
 							<div class="form-group" :class="{'has-error': errors.debit_limit}">
 								<label><i class="fa fa-unlock-alt" aria-hidden="true"></i> Debit Limit</label>
 								<input type="text" name="debit_limit" class="form-control" placeholder="Debit Limit"
 									   v-model="profile.debit_limit">
 								<span class="help-block" v-if="errors.debit_limit">{{ errors.debit_limit[0] }}</span>
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="form-group" :class="{'has-error': errors.snapshot_limit}">
+								<label><i class="fa fa-unlock-alt" aria-hidden="true"></i> Snapshots Limit</label>
+								<input type="number" name="snapshot_limit" class="form-control" placeholder="Snapshot Limit"
+									   v-model="profile.snapshot_limit">
+								<span class="help-block" v-if="errors.snapshot_limit">{{ errors.snapshot_limit[0] }}</span>
 							</div>
 						</div>
 					</div>

@@ -61,7 +61,7 @@
 								<div class="form-group" :class="{'has-error': errors.password }">
 									<label>Password</label>
 									<input type="text" name="password" class="form-control" placeholder="Password">
-									<span class="help-block" v-if="errors.name">{{ errors.name[0] }}</span>
+									<span class="help-block" v-if="errors.password">{{ errors.password[0] }}</span>
 								</div>
 							</div>
 						</div>
@@ -75,14 +75,14 @@
 										<input type="text" name="ram" class="form-control">
 										<div class="input-group-addon">MB</div>
 									</div>
-									<span class="help-block" v-if="errors.name">{{ errors.name[0] }}</span>
+									<span class="help-block" v-if="errors.ram">{{ errors.ram[0] }}</span>
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="form-group" :class="{'has-error': errors.cpu_cores}">
 									<label> CPU Cores</label>
 									<input type="number" name="cpu_cores" class="form-control">
-									<span class="help-block" v-if="errors.name">{{ errors.name[0] }}</span>
+									<span class="help-block" v-if="errors.ram">{{ errors.ram[0] }}</span>
 								</div>
 							</div>
 						</div>
@@ -91,14 +91,14 @@
 								<div class="form-group" :class="{'has-error': errors.cpu_units}">
 									<label> CPU Units</label>
 									<input type="number" name="cpu_units" class="form-control">
-									<span class="help-block" v-if="errors.name">{{ errors.name[0] }}</span>
+									<span class="help-block" v-if="errors.cpu_units">{{ errors.cpu_units[0] }}</span>
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="form-group" :class="{'has-error': errors.cpu_percent}">
 									<label> CPU Percent</label>
 									<input type="number" name="cpu_percent" class="form-control">
-									<span class="help-block" v-if="errors.name">{{ errors.name[0] }}</span>
+									<span class="help-block" v-if="errors.cpu_percent">{{ errors.cpu_percent[0] }}</span>
 								</div>
 							</div>
 						</div>
@@ -111,8 +111,7 @@
 									<div class="row">
 										<div class="col-md-6">
 											<div class="form-group" :class="{'has-error': errors['storages.0']}">
-												<select2 v-bind:name="'storages[0]'" v-bind:allowclear="'false'"
-														 v-once></select2>
+												<select2 v-bind:name="'storages[0]'" v-bind:allowclear="'false'" v-once></select2>
 											</div>
 										</div>
 										<div class="col-md-6">
@@ -121,9 +120,7 @@
 													<input type="text" class="form-control" name="disks[0]">
 													<span class="input-group-addon">GB</span>
 													<span class="input-group-btn">
-                                                        <button class="btn btn-default" type="button"
-																@click.prevent="addDisk"><i class="fa fa-plus"
-																							aria-hidden="true"></i></button>
+                                                        <button class="btn btn-default" type="button" @click.prevent="addDisk"><i class="fa fa-plus" aria-hidden="true"></i></button>
                                                     </span>
 												</div>
 												<span class="help-block" v-if="errors['disks.0']">{{ errors['disks.0'] }}</span>
@@ -238,8 +235,7 @@
 										<option value="downloads">Downloads</option>
 										<option value="both">Both</option>
 									</select>
-									<span class="help-block"
-										  v-if="errors.bandwidth_accounting">{{ errors.bandwidth_accounting[0] }}</span>
+									<span class="help-block" v-if="errors.bandwidth_accounting">{{ errors.bandwidth_accounting[0] }}</span>
 								</div>
 							</div>
 						</div>
@@ -253,8 +249,7 @@
 										<option value="suspend_instance">Suspend Instance</option>
 										<option value="billing">Bill Overage</option>
 									</select>
-									<span class="help-block"
-										  v-if="errors.bandwidth_overage">{{ errors.bandwidth_overage[0] }}</span>
+									<span class="help-block" v-if="errors.bandwidth_overage">{{ errors.bandwidth_overage[0] }}</span>
 								</div>
 							</div>
 							<div class="col-md-6">
@@ -268,9 +263,7 @@
 											   :disabled="!enabledBilling || bandwidth_overage !== 'billing'">
 										<div class="input-group-addon">/GB</div>
 									</div>
-									<span class="help-block" v-if="errors.overage_price">{{
-											errors.overage_price[0]
-										}}</span>
+									<span class="help-block" v-if="errors.overage_price">{{ errors.overage_price[0] }}</span>
 								</div>
 							</div>
 						</div>
@@ -300,19 +293,21 @@
 						</div>
 						<div class="row">
 							<div class="col-md-6">
-								<div class="form-group" :class="{'has-error': errors.ips}">
+								<div class="form-group" :class="{'has-error': errors['ips.0']}">
 									<label>Public IPv4</label>
 									<select class="form-control" id="ipv4" name="ips[]" multiple="multiple">
 
 									</select>
+									<span class="help-block" v-if="errors['ips.0']">{{ errors['ips.0'] }}</span>
 								</div>
 							</div>
 							<div class="col-md-6">
-								<div class="form-group" :class="{'has-error': errors.ips}">
+								<div class="form-group" :class="{'has-error': errors['ips.0']}">
 									<label>Public IPv6</label>
 									<select class="form-control" id="ipv6" name="ips[]" multiple="multiple">
 
 									</select>
+									<span class="help-block" v-if="errors['ips.0']">{{ errors['ips.0'] }}</span>
 								</div>
 							</div>
 						</div>
@@ -326,11 +321,12 @@
 								</div>
 							</div>
 							<div class="col-md-6">
-								<div class="form-group" :class="{'has-error': errors.ips}">
+								<div class="form-group" :class="{'has-error': errors['ips.0']}">
 									<label>Private IPv4</label>
 									<select class="form-control" id="pipv4" name="ips[]">
 
 									</select>
+									<span class="help-block" v-if="errors['ips.0']">{{ errors['ips.0'] }}</span>
 								</div>
 							</div>
 						</div>
@@ -410,9 +406,7 @@
 												   :disabled="!enabledBilling">
                                             <div class="input-group-addon">/mo</div>
                                         </div>
-                                        <span class="help-block" v-if="errors.overage_price">{{
-												errors.overage_price[0]
-											}}</span>
+                                        <span class="help-block" v-if="errors.overage_price">{{ errors.overage_price[0] }}</span>
                                     </div>
                                 </div>
                             </div>

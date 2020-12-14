@@ -8,6 +8,9 @@
 				<span class="caret"></span>
 			</button>
 			<ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+				<li v-if="is_reseller">
+					<nuxt-link :to="{name: 'user-subuser-create'}">New Subuser</nuxt-link>
+				</li>
 				<li v-if="enabledBilling && !is_reseller">
 					<nuxt-link :to="{name: 'user-instance-create'}">New Instance</nuxt-link>
 				</li>
@@ -29,8 +32,7 @@
 			<div class="row">
 				<div class="col-md-8">
 					<div class="wow fadeIn blocks instance" v-if="instances.data.length > 0">
-						<input type="search" placeholder="Search Instances" v-model="pagination_search"
-							   @keyup.enter="search"/>
+						<input type="search" placeholder="Search Instances" v-model="pagination_search" @keyup.enter="search"/>
 						<br/>
 						<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 							<div class="panel panel-default" v-for="(instance,$index) in instances.data">
@@ -39,28 +41,26 @@
 								   class="collapsed">
 									<div class="panel-heading" role="tab" id="headinglast">
 										<h4 class="panel-title name">
-											<i class="fa fa-server" aria-hidden="true"></i>&nbsp; {{
-												instance.hostname
-											}} <span v-if="instance.user_id !== user.id">{{
-												instance.user ? instance.user.email : ''
-											}}</span>
+											<i class="fa fa-server" aria-hidden="true"></i>&nbsp; {{ instance.hostname }} <span v-if="instance.user_id !== user.id">{{ instance.user ? instance.user.email : '' }}</span>
 											<div class="status">
-
-                                                <span v-if="instance.created === 1" class="label" :class="{
-                                                    'label-success': is_running(instance) && !is_suspended(instance),
-                                                    'label-danger': is_stopped(instance) && !is_suspended(instance),
-                                                    'label-default': unknown_suspended_state(instance) }">
-                                                    {{ instance_status(instance) }}
-                                                </span>
-												<span v-else-if="instance.created === 0 && instance.running_task" class="label label-info">
-													<i class="fa fa-spin fa-spinner"></i> Deploying
-                                                </span>
-												<span v-else-if="is_migrating(instance)" class="label label-info">
+												<span v-if="is_migrating(instance)" class="label label-info">
 													<i class="fa fa-spin fa-spinner"></i> Migrating
                                                 </span>
-												<span v-else-if="instance.created === 0 && !instance.running_task" class="label label-danger">
-                                                    Deploy Failed
-                                                </span>
+												<span v-else-if="instance.running_task">
+													<label v-if="( instance.created === 0 || instance.created === 1 )">
+														<span v-for="task in instance.tasks" v-if="['done','failed'].indexOf(task.status) === -1" class="label label-info">
+															<i class="fa fa-spin fa-spinner"></i> {{ tasks[task.action] }}
+														</span>
+													</label>
+												</span>
+												<span v-else>
+													<span v-if="instance.created === 1" class="label" :class="{'label-success': is_running(instance) && !is_suspended(instance),'label-danger': is_stopped(instance) && !is_suspended(instance), 'label-default': unknown_suspended_state(instance) }">
+														{{ instance_status(instance) }}
+													</span>
+													<span v-else-if="instance.created === 0" class="label label-danger">
+                                                    	Deploy Failed
+                                                	</span>
+												</span>
 											</div>
 										</h4>
 									</div>
@@ -76,16 +76,17 @@
 											</div>
 											<div class="col-md-3">
 												<p><b>RAM</b>: {{ instance.ram / 1024 }}GB</p>
-												<p><b>Location</b>: {{
-														instance.hypervisor.region_id !== '' ? instance.hypervisor.region.length !== 0 ? instance.hypervisor.region[0].name + ', ' + instance.hypervisor.region[0].country : false : 'N/A'
-													}}</p>
+												<p><b>Location</b>: {{ instance.hypervisor.region_id !== '' ? instance.hypervisor.region.length !== 0 ? instance.hypervisor.region[0].name + ', ' + instance.hypervisor.region[0].country : false : 'N/A' }}</p>
 											</div>
 											<div class="col-md-3">
 												<p><b>OS</b>: {{ instance.os }}</p>
-												<p><b>IP</b>: <span v-for="ip in instance.ips"
-																	v-if="ip.type === 'public' && ip.primary === 1">{{
-														ip.ip
-													}}</span></p>
+												<p>
+													<b>IP</b>:
+													<span v-for="ip in instance.ips" v-if="ip.type === 'public' && ip.primary === 1">
+														<span v-if="ip.version === 'v6_subnet'">{{ ip.ip }}/{{ ip.ip_mask }}<br /></span>
+														<span v-else>{{ ip.ip }}<br /></span>
+													</span>
+												</p>
 											</div>
 											<div class="col-md-3">
 												<a :href="'/user/instance/'+instance.id">
@@ -189,7 +190,10 @@ export default {
 				stop_instance: 'Powering Off',
 				shutdown_instance: 'Shutting Down',
 				restart_instance: 'Rebooting',
-				destroy_instance: 'Destroying Instance'
+				destroy_instance: 'Destroying',
+				resume_instance: 'Resuming',
+				suspend_instance: 'Suspending',
+				create_snapshot: 'Creating Snapshot'
 			},
 		}
 	},
@@ -252,7 +256,7 @@ export default {
 			clearInterval(vm.polling);
 			vm.polling = setInterval(() => {
 				vm.update_tasks();
-			}, 1000);
+			}, 10000);
 		},
 		async update_tasks() {
 			let vm = this, end = ['done', 'failed'];
@@ -271,8 +275,7 @@ export default {
 								if (task_id === task.id) {
 									vm.$set(vm.instances.data[ik].tasks, tk, task);
 									if ($.inArray(task.status, end) !== -1) {
-										let response = await vm.$axios.get('/user/instances/' + task.instance_id).catch((error) => {
-										});
+										let response = await vm.$axios.get('/user/instances/' + task.instance_id);
 										vm.poll_tasks.splice(vm.poll_tasks.index(task_id), 1);
 										vm.$set(vm.instances.data[ik], "running_task", false);
 										vm.$set(vm.instances.data, ik, response.data);
@@ -358,6 +361,8 @@ export default {
 	},
 	beforeDestroy() {
 		clearInterval(this.polling);
+		this.poll_tasks = null;
+		this.initiated = null;
 	},
 	computed: {
 

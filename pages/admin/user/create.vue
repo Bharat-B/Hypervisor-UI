@@ -249,9 +249,7 @@
 								<label><i class="fa fa-unlock-alt" aria-hidden="true"></i> Instance Limit</label>
 								<input type="number" name="instance_limit" class="form-control"
 									   placeholder="Instance Limit" v-model="form.instance_limit">
-								<span class="help-block" v-if="errors.instance_limit">{{
-										errors.instance_limit[0]
-									}}</span>
+								<span class="help-block" v-if="errors.instance_limit">{{ errors.instance_limit[0] }}</span>
 							</div>
 						</div>
 						<div class="col-md-6">

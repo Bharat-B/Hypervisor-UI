@@ -166,7 +166,7 @@
                                     <li><b>License</b>: {{ hypervisor.license.key }}</li>
                                     <li><b>Status</b>: {{ hypervisor.license.status }}</li>
                                     <li><b>Type</b>: {{ hypervisor.license.type }}</li>
-                                    <li><b>Instance Count:</b> {{ hypervisor.license.licnumvs === -1 ? 'Unlimited' : hypervisor.license.licnumvs }}</li>
+                                    <li><b>Instance Limit:</b> {{ hypervisor.license.licnumvs === '-1' ? 'Unlimited' : hypervisor.license.licnumvs }}</li>
                                     <li><b>License Expiry</b>: {{ hypervisor.license.expires_on }}</li>
                                 </span>
 							</div>
@@ -366,8 +366,6 @@ export default {
 					}
 				}
 			}
-
-			console.log(JSON.stringify(bandwidth_series));
 
 			vm.$set(vm.bandwidthChart,"series",[
 				{

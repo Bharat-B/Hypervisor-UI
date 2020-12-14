@@ -240,7 +240,7 @@ export default {
 			});
 			vm.polling = setInterval(() => {
 				vm.update_tasks();
-			}, 5000);
+			}, 20000);
 		},
 		async update_tasks() {
 			let vm = this, end = ['done', 'failed'];
@@ -277,33 +277,39 @@ export default {
 			}
 		},
 		async get_tasks() {
+			let vm = this;
 			clearInterval(this.polling);
-			let response = await this.$axios.get('/admin/tasks', {
+			let response = await vm.$axios.get('/admin/tasks', {
 				params: {
-					page: this.$route.query.page ? this.$route.query.page : 1,
-					per_page: this.$route.query.per_page ? this.$route.query.per_page : 20,
-					action: this.$route.query.action,
-					status: this.$route.query.status,
-					instance_id: this.$route.query.instance_id,
-					hypervisor_id: this.$route.query.hypervisor_id
+					page: vm.$route.query.page ? vm.$route.query.page : 1,
+					per_page: vm.$route.query.per_page ? vm.$route.query.per_page : 20,
+					action: vm.$route.query.action,
+					status: vm.$route.query.status,
+					instance_id: vm.$route.query.instance_id,
+					hypervisor_id: vm.$route.query.hypervisor_id
 				}
 			});
-			this.$set(this, 'task_pagination', {
-				page: this.$route.query.page ? this.$route.query.page : 1,
-				per_page: this.$route.query.per_page ? this.$route.query.per_page : 20,
+			response.data.forEach((task,k)=>{
+				if( vm.selected_tasks.indexOf(task.id) !== -1 ){
+					response.data[k].selected = true;
+				}
+			});
+			vm.$set(vm, 'task_pagination', {
+				page: vm.$route.query.page ? vm.$route.query.page : 1,
+				per_page: vm.$route.query.per_page ? vm.$route.query.per_page : 20,
 				tasks: response.data
 			});
-			this.$set(this, 'filter', {
-				action: this.$route.query.action,
-				status: this.$route.query.status,
-				instance_id: this.$route.query.instance_id,
-				hypervisor_id: this.$route.query.hypervisor_id
+			vm.$set(vm, 'filter', {
+				action: vm.$route.query.action,
+				status: vm.$route.query.status,
+				instance_id: vm.$route.query.instance_id,
+				hypervisor_id: vm.$route.query.hypervisor_id
 			});
 			this.do_polling();
 		},
 		delete_tasks() {
 			let vm = this;
-			this.processing = true;
+			vm.processing = true;
 			bootbox.confirm({
 				title: "Delete the selected task(s)?",
 				message: "Please note that no further confirmations will appear.",

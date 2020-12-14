@@ -9,8 +9,14 @@
 				<span class="caret"></span>
 			</button>
 			<ul aria-labelledby="dropdownMenu2" class="dropdown-menu">
-				<li v-if="enabledBilling">
+				<li v-if="is_reseller">
+					<nuxt-link :to="{name: 'user-subuser-create'}">New Subuser</nuxt-link>
+				</li>
+				<li v-if="enabledBilling && !is_reseller">
 					<nuxt-link :to="{name: 'user-instance-create'}">New Instance</nuxt-link>
+				</li>
+				<li v-if="is_reseller">
+					<nuxt-link :to="{name: 'user-instance-reseller-create'}">New Instance</nuxt-link>
 				</li>
 				<li>
 					<nuxt-link :to="{name: 'user-firewall-create'}">New Firewall</nuxt-link>

@@ -191,8 +191,7 @@
 									<option value="downloads">Downloads</option>
 									<option value="both">Both</option>
 								</select>
-								<span class="help-block"
-									  v-if="errors.bandwidth_accounting">{{ errors.bandwidth_accounting[0] }}</span>
+								<span class="help-block" v-if="errors.bandwidth_accounting">{{ errors.bandwidth_accounting[0] }}</span>
 							</div>
 						</div>
 					</div>
@@ -206,9 +205,7 @@
 									<option value="suspend_instance">Suspend Instance</option>
 									<option value="billing">Bill Overage</option>
 								</select>
-								<span class="help-block" v-if="errors.bandwidth_overage">{{
-										errors.bandwidth_overage[0]
-									}}</span>
+								<span class="help-block" v-if="errors.bandwidth_overage">{{ errors.bandwidth_overage[0] }}</span>
 							</div>
 						</div>
 						<div class="col-md-6" v-if="bandwidth_overage === 'billing'">
@@ -223,9 +220,7 @@
 										   :disabled="!enabledBilling">
 									<div class="input-group-addon">/GB</div>
 								</div>
-								<span class="help-block" v-if="errors.overage_price">{{
-										errors.overage_price[0]
-									}}</span>
+								<span class="help-block" v-if="errors.overage_price">{{ errors.overage_price[0] }}</span>
 							</div>
 						</div>
 						<div class="col-md-6" v-else>
@@ -366,7 +361,6 @@ export default {
 		if (route.query.duplicate) {
 			if (route.query.duplicate !== '') {
 				let response = await $axios.get('/admin/plans/' + route.query.duplicate);
-				console.log(response.data);
 				return {
 					duplicate: response.data,
 					disk_driver: response.data.disk_driver,
@@ -377,12 +371,14 @@ export default {
 	},
 	methods: {
 		create() {
-			this.processing = true;
-			this.$axios.post('/admin/plans', $('form').serialize()).then((response) => {
-				this.processing = false;
-				this.$router.push({name: 'admin-plan-id', params: {id: response.data.id}});
+			let vm = this;
+			vm.processing = true;
+			vm.$axios.post('/admin/plans', $('form').serialize()).then((response) => {
+				console.log(response);
+				vm.processing = false;
+				vm.$router.push({name: 'admin-plan-id', params: {id: response.id}});
 			}).catch((error) => {
-				this.processing = false;
+				vm.processing = false;
 			});
 		}
 	},

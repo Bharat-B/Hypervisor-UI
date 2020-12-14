@@ -1,7 +1,5 @@
 <template>
 	<div class="dashcontent instance-s">
-		<h1 style="font-size: 14pt;"><img :alt="instance.os_name" :src="'/assets/'+instance.os_distro+'.png'"/>
-			{{ instance.hostname }}</h1>
 		<p>
 			<nuxt-link :to="{name: 'admin-instances'}">
 				<button class="btn btn-default"><i aria-hidden="true" class="far fa-caret-square-left"></i>&nbsp; All
@@ -10,57 +8,50 @@
 			</nuxt-link>
 		</p>
 		<div class="cpanel">
-			<a :class="{disabled:  disableAction || instance_running || instance_suspended || instance_network_suspended }" href="#"
-			   @click.prevent="action('start')"><i
-				aria-hidden="true" class="fa fa-play"></i> <span>Start</span></a>
-			<a :class="{disabled:  disableAction || instance_stopped || instance_suspended || instance_network_suspended }" data-placement="bottom"
-			   data-toggle="tooltip"
-			   href="#" title="Stop this server" @click.prevent="action('stop')"><i aria-hidden="true"
-																						 class="fa fa-stop"></i> <span>Stop</span></a>
-			<a :class="{disabled: disableAction || instance_suspended || instance_network_suspended }" data-placement="bottom"
-			   data-toggle="tooltip"
-			   href="#" title="Restart this server" @click.prevent="action('restart')"><i aria-hidden="true"
-																							class="fas fa-redo"></i>
-				<span>Restart</span></a>
-			<a :class="{disabled:  disableAction || instance_stopped }" data-placement="bottom" data-toggle="tooltip"
-			   href="#" title="Open console" @click.prevent="novnc"><i aria-hidden="true"
-																					 class="fa fa-terminal"></i> <span>Console</span></a>
-
-			<a v-if="!instance_suspended" :class="{disabled: disableAction || instance_suspended }" data-placement="bottom"
-			   data-toggle="tooltip" href="#" title="Suspend" @click.prevent="action('suspend')"><i
-				aria-hidden="true" class="fas fa-pause"></i> <span>Suspend</span></a>
-			<a v-if="instance_suspended" :class="{disabled: disableAction && !instance_suspended }" data-placement="bottom"
-			   data-toggle="tooltip" href="#" title="Unsuspend" @click.prevent="action('resume')"><i
-				aria-hidden="true" class="fas fa-play"></i> <span>Unsuspend</span></a>
-			<a v-if="!instance_network_suspended" :class="{disabled: disableAction || instance_network_suspended }"
-			   data-placement="bottom" data-toggle="tooltip"
-			   href="#" title="Suspend" @click.prevent="action('suspend_network')"><i aria-hidden="true"
-																				class="fas fa-wifi"></i> <span>Suspend Network</span></a>
-			<a v-if="instance_network_suspended" :class="{disabled: disableAction || !instance_network_suspended }"
-			   data-placement="bottom" data-toggle="tooltip"
-			   href="#" title="Unsuspend Network" @click.prevent="action('resume_network')"><i aria-hidden="true"
-																						  class="fas fa-wifi"></i> <span>Unsuspend Network</span></a>
-
-			<a v-if="enabledBilling" :class="{disabled: disableAction || instance_suspended || instance_network_suspended }"
-			   class="hide"
-			   data-placement="bottom" data-toggle="tooltip" href="#" title="Destroy" @click.prevent="action('destroy')"><i
-				aria-hidden="true" class="fas fa-trash"></i></a>
+			<a :class="{disabled:  disableAction || instance_running || instance_suspended || instance_network_suspended }" href="#" @click.prevent="action('start')">
+				<i aria-hidden="true" class="fa fa-play"></i> <span>Start</span>
+			</a>
+			<a :class="{disabled:  disableAction || instance_stopped || instance_suspended || instance_network_suspended }" data-placement="bottom" data-toggle="tooltip" href="#" title="Stop this server" @click.prevent="action('stop')">
+				<i aria-hidden="true" class="fa fa-stop"></i> <span>Stop</span>
+			</a>
+			<a :class="{disabled: disableAction || instance_suspended || instance_network_suspended }" data-placement="bottom" data-toggle="tooltip" href="#" title="Restart this server" @click.prevent="action('restart')">
+				<i aria-hidden="true" class="fas fa-redo"></i><span>Restart</span>
+			</a>
+			<a :class="{disabled:  disableAction || instance_stopped }" data-placement="bottom" data-toggle="tooltip" href="#" title="Open console" @click.prevent="novnc">
+				<i aria-hidden="true" class="fa fa-terminal"></i> <span>Console</span>
+			</a>
+			<a v-if="!instance_suspended" :class="{disabled: disableAction || instance_suspended }" data-placement="bottom" data-toggle="tooltip" href="#" title="Suspend" @click.prevent="action('suspend')"><i
+				aria-hidden="true" class="fas fa-pause"></i> <span>Suspend</span>
+			</a>
+			<a v-if="instance_suspended" :class="{disabled: disableAction && !instance_suspended }" data-placement="bottom" data-toggle="tooltip" href="#" title="Unsuspend" @click.prevent="action('resume')">
+				<i aria-hidden="true" class="fas fa-play"></i> <span>Unsuspend</span>
+			</a>
+			<a v-if="!instance_network_suspended" :class="{disabled: disableAction || instance_network_suspended }" data-placement="bottom" data-toggle="tooltip" href="#" title="Suspend" @click.prevent="action('suspend_network')">
+				<i aria-hidden="true" class="fas fa-wifi"></i> <span>Suspend Network</span>
+			</a>
+			<a v-if="instance_network_suspended" :class="{disabled: disableAction || !instance_network_suspended }" data-placement="bottom" data-toggle="tooltip" href="#" title="Unsuspend Network" @click.prevent="action('resume_network')">
+				<i aria-hidden="true" class="fas fa-wifi"></i> <span>Unsuspend Network</span>
+			</a>
+			<a v-if="enabledBilling" :class="{disabled: disableAction || instance_suspended || instance_network_suspended }" class="hide" data-placement="bottom" data-toggle="tooltip" href="#" title="Destroy" @click.prevent="action('destroy')">
+				<i aria-hidden="true" class="fas fa-trash"></i>
+			</a>
 		</div>
 		<div class="dashstuff">
 			<ul class="nav nav-tabs" role="tablist">
 				<li :class="{active: $route.query.tab === 'overview'}" role="presentation">
-					<a aria-controls="overview" data-toggle="tab" href="#overview" role="tab"
-					   @click.prevent="tab('overview')"><i aria-hidden="true" class="fas fa-tachometer-alt"></i> Overview</a>
+					<a aria-controls="overview" data-toggle="tab" href="#overview" role="tab" @click.prevent="tab('overview')">
+						<i aria-hidden="true" class="fas fa-tachometer-alt"></i> Overview
+					</a>
 				</li>
 				<li :class="{active: $route.query.tab === 'settings'}" class="last" role="presentation">
-					<a aria-controls="settings" data-toggle="tab" href="#settings" role="tab"
-					   @click.prevent="tab('settings')"><i aria-hidden="true" class="fas fa-sliders-h"></i> Settings</a>
+					<a aria-controls="settings" data-toggle="tab" href="#settings" role="tab" @click.prevent="tab('settings')">
+						<i aria-hidden="true" class="fas fa-sliders-h"></i> Settings
+					</a>
 				</li>
 			</ul>
 			<div class="tab-content">
-				<div id="overview" :class="{'active': $route.query.tab === 'overview'}" class="wow fadeIn tab-pane"
-					 role="tabpanel">
-					<h3>Overview</h3>
+				<div id="overview" :class="{'active': $route.query.tab === 'overview'}" class="wow fadeIn tab-pane" role="tabpanel">
+					<h3 style="font-size: 14pt;"><img :alt="instance.os_name" :src="'/assets/'+instance.os_distro+'.png'"/>{{ instance.hostname }} - Overview</h3>
 					<br/>
 					<div v-if="enabledBilling" class="charges">
 						<p>Current Charges</p>
@@ -68,52 +59,53 @@
 					</div>
 					<div class="row details">
 						<div class="col-md-6">
-							<p><i aria-hidden="true" class="far fa-dot-circle"></i> <b>Status</b>: {{ instance_status }}
+							<p v-if="running_task">
+								<label v-if="( instance.created === 0 || instance.created === 1 )">
+									<i aria-hidden="true" class="far fa-dot-circle"></i> <b>Status</b>:
+									<span v-for="task in instance.tasks" v-if="['done','failed'].indexOf(task.status) === -1" class="label label-info">
+										<i class="fa fa-spin fa-spinner"></i> {{ tasks[task.action] }}
+									</span>
+								</label>
+							</p>
+							<p v-else-if="is_migrating">
+								<i aria-hidden="true" class="far fa-dot-circle"></i> <b>Status</b>:
+								<span class="label label-info">
+									<i class="fa fa-spin fa-spinner"></i> Migrating
+								</span>
+							</p>
+							<p v-else>
+								<i aria-hidden="true" class="far fa-dot-circle"></i> <b>Status</b>: {{ instance_status }}
 							</p>
 							<p><i aria-hidden="true" class="far fa-dot-circle"></i> <b>OS</b>: {{ instance.os }}</p>
-							<p><i aria-hidden="true" class="far fa-dot-circle"></i> <b>CPU</b>: {{ instance.cpu_cores }}
-								vCore(s) </p>
-							<p><i aria-hidden="true" class="far fa-dot-circle"></i> <b>RAM</b>: {{
-									$Mb2Gb(instance.ram)
-								}} </p>
-							<p v-if="instance.disks.length > 0"><i aria-hidden="true" class="far fa-dot-circle"></i> <b>Primary
-								Storage:</b>: {{ $Gb2Tb(instance.disks[0].size) }} SSD</p>
-							<p><i aria-hidden="true" class="far fa-dot-circle"></i> <b>Location</b>:
-								{{ instance_location }} </p>
+							<p><i aria-hidden="true" class="far fa-dot-circle"></i> <b>CPU</b>: {{ instance.cpu_cores }} vCore(s) </p>
+							<p><i aria-hidden="true" class="far fa-dot-circle"></i> <b>RAM</b>: {{ $Mb2Gb(instance.ram) }} </p>
+							<p v-if="instance.disks.length > 0"><i aria-hidden="true" class="far fa-dot-circle"></i> <b>Primary Storage:</b>: {{ $Gb2Tb(instance.disks[0].size) }} SSD</p>
+							<p><i aria-hidden="true" class="far fa-dot-circle"></i> <b>Location</b>: {{ instance_location }} </p>
 						</div>
 						<div class="col-md-6">
 							<p><i aria-hidden="true" class="far fa-dot-circle"></i> <b>IPv4</b>: {{ primary_ipv4 }}</p>
 							<p><i aria-hidden="true" class="far fa-dot-circle"></i> <b>IPv6</b>: {{ primary_ipv6 }}</p>
-							<p><i aria-hidden="true" class="far fa-dot-circle"></i> <b>IPv6 Subnet</b>:
-								{{ primary_ipv6_subnet }}</p>
-							<p><i aria-hidden="true" class="far fa-dot-circle"></i> <b>Private IPv4</b>: {{
-									private_ipv4
-								}}</p>
-							<p><i aria-hidden="true" class="far fa-dot-circle"></i> <b>Hypervisor</b>:
-								{{ instance.hypervisor.name }}</p>
-							<p v-if="instance.plan_id !== '' && instance.plan_id !== '0'"><i aria-hidden="true"
-																							 class="far fa-dot-circle"></i> <b>Plan</b>:
-								{{ instance.plan.name }}</p>
+							<p><i aria-hidden="true" class="far fa-dot-circle"></i> <b>IPv6 Subnet</b>: {{ primary_ipv6_subnet }}</p>
+							<p><i aria-hidden="true" class="far fa-dot-circle"></i> <b>Private IPv4</b>: {{ private_ipv4 }}</p>
+							<p><i aria-hidden="true" class="far fa-dot-circle"></i> <b>Hypervisor</b>: {{ instance.hypervisor.name }}</p>
+							<p v-if="instance.plan_id !== '' && instance.plan_id !== '0'">
+								<i aria-hidden="true" class="far fa-dot-circle"></i> <b>Plan</b>: {{ instance.plan.name }}
+							</p>
 						</div>
 					</div>
 					<div class="row">
 						<div class="col-md-6">
 							<b>Bandwidth Usage</b>
-							<p v-if="instance.bandwidth !== 0" class="less">{{ instance.used_bandwidth }}GB of
-								{{ instance.bandwidth }}GB</p>
+							<p v-if="instance.bandwidth !== 0" class="less">{{ instance.used_bandwidth }}GB of {{ instance.bandwidth }}GB</p>
 							<div class="progress">
-								<div :aria-valuenow="instance_used_bandwidth_percent" :style="{width: instance_used_bandwidth_percent+'%'}"
-									 aria-valuemax="100" aria-valuemin="0"
-									 class="progress-bar progress-bar-striped active" role="progressbar">
+								<div :aria-valuenow="instance_used_bandwidth_percent" :style="{width: instance_used_bandwidth_percent+'%'}" aria-valuemax="100" aria-valuemin="0" class="progress-bar progress-bar-striped active" role="progressbar">
 									{{ instance_used_bandwidth_percent }}%
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-
-				<div id="settings" :class="{'active': $route.query.tab === 'settings'}" class="wow fadeIn tab-pane"
-					 role="tabpanel">
+				<div id="settings" :class="{'active': $route.query.tab === 'settings'}" class="wow fadeIn tab-pane" role="tabpanel">
 					<br/>
 					<div class="row">
 						<div class="col-md-3">
@@ -122,46 +114,52 @@
 																						   class="fa fa-bars"></i>
 									Settings</a></h3>
 								<ul id="sidemenu" class="animated fadeIn nav nav-tabs" role="tablist">
-									<li :class="{'active': $route.query.subtab === 'disk'}" role="presentation"><a
-										aria-controls="home" data-toggle="tab" href="#disk"
-										role="tab" @click.prevent="tab('settings','disk')"><i aria-hidden="true" class="fas fa-power-off"></i>
-										Disk Settings</a></li>
-									<li :class="{'active': $route.query.subtab === 'rescue'}" role="presentation"><a
-										aria-controls="rescue" data-toggle="tab" href="#rescue"
-										role="tab" @click.prevent="tab('settings','rescue')"><i aria-hidden="true" class="fa fa-life-ring"></i>
-										Rescue</a></li>
-									<li :class="{'active': $route.query.subtab === 'network'}" role="presentation"><a
-										aria-controls="home" data-toggle="tab" href="#network"
-										role="tab" @click.prevent="tab('settings','network')"><i aria-hidden="true" class="fa fa-globe"></i>
-										Network</a></li>
-									<li :class="{'active': $route.query.subtab === 'custom-iso'}" role="presentation"><a
-										aria-controls="settings" data-toggle="tab"
-										href="#custom-iso" role="tab" @click.prevent="tab('settings','custom-iso')"><i
-										aria-hidden="true" class="fas fa-compact-disc"></i> Custom ISO</a></li>
-									<li :class="{'active': $route.query.subtab === 'hostname'}" role="presentation"><a
-										aria-controls="settings" data-toggle="tab"
-										href="#hostname" role="tab" @click.prevent="tab('settings','hostname')"><i aria-hidden="true"
-																								 class="fa fa-cog"></i>
-										Change Hostname</a></li>
-									<li :class="{'active': $route.query.subtab === 'password'}" role="presentation"><a
-										aria-controls="settings" data-toggle="tab"
-										href="#password" role="tab" @click.prevent="tab('settings','password')"><i aria-hidden="true"
-																								 class="fas fa-key"></i>
-										Change Password</a></li>
-									<li :class="{'active': $route.query.subtab === 'os'}" role="presentation"><a
-										aria-controls="settings" data-toggle="tab" href="#os"
-										role="tab" @click.prevent="tab('settings','os')"><i aria-hidden="true" class="fab fa-linux"></i>
-										Change OS</a></li>
-									<li :class="{'active': $route.query.subtab === 'vnc'}" role="presentation"><a
-										aria-controls="vnc" data-toggle="tab" href="#vnc"
-										role="tab" @click.prevent="tab('settings','vnc')"><i aria-hidden="true" class="fa fa-terminal"></i>
-										VNC Details</a></li>
-									<li :class="{'active': $route.query.subtab === 'tasks'}" role="presentation"><a
-										aria-controls="tasks" data-toggle="tab" href="#tasks"
-										role="tab" @click.prevent="tab('settings','tasks')"><i aria-hidden="true" class="fas fa-tasks"></i>
-										Tasks</a></li>
+									<li :class="{'active': $route.query.subtab === 'disk'}" role="presentation">
+										<a aria-controls="home" data-toggle="tab" href="#disk" role="tab" @click.prevent="tab('settings','disk')">
+											<i aria-hidden="true" class="fas fa-power-off"></i> Disk Settings
+										</a>
+									</li>
+									<li :class="{'active': $route.query.subtab === 'rescue'}" role="presentation">
+										<a aria-controls="rescue" data-toggle="tab" href="#rescue" role="tab" @click.prevent="tab('settings','rescue')">
+											<i aria-hidden="true" class="fa fa-life-ring"></i> Rescue
+										</a>
+									</li>
+									<li :class="{'active': $route.query.subtab === 'network'}" role="presentation">
+										<a aria-controls="home" data-toggle="tab" href="#network" role="tab" @click.prevent="tab('settings','network')">
+											<i aria-hidden="true" class="fa fa-globe"></i> Network
+										</a>
+									</li>
+									<li :class="{'active': $route.query.subtab === 'custom-iso'}" role="presentation">
+										<a aria-controls="settings" data-toggle="tab" href="#custom-iso" role="tab" @click.prevent="tab('settings','custom-iso')">
+											<i aria-hidden="true" class="fas fa-compact-disc"></i> Custom ISO
+										</a>
+									</li>
+									<li :class="{'active': $route.query.subtab === 'hostname'}" role="presentation">
+										<a aria-controls="settings" data-toggle="tab" href="#hostname" role="tab" @click.prevent="tab('settings','hostname')">
+											<i aria-hidden="true" class="fa fa-cog"></i> Change Hostname
+										</a>
+									</li>
+									<li :class="{'active': $route.query.subtab === 'password'}" role="presentation">
+										<a aria-controls="settings" data-toggle="tab" href="#password" role="tab" @click.prevent="tab('settings','password')">
+											<i aria-hidden="true" class="fas fa-key"></i> Change Password
+										</a>
+									</li>
+									<li :class="{'active': $route.query.subtab === 'os'}" role="presentation">
+										<a aria-controls="settings" data-toggle="tab" href="#os" role="tab" @click.prevent="tab('settings','os')">
+											<i aria-hidden="true" class="fab fa-linux"></i> Change OS
+										</a>
+									</li>
+									<li :class="{'active': $route.query.subtab === 'vnc'}" role="presentation">
+										<a aria-controls="vnc" data-toggle="tab" href="#vnc" role="tab" @click.prevent="tab('settings','vnc')">
+											<i aria-hidden="true" class="fa fa-terminal"></i> VNC Details
+										</a>
+									</li>
+									<li :class="{'active': $route.query.subtab === 'tasks'}" role="presentation">
+										<a aria-controls="tasks" data-toggle="tab" href="#tasks" role="tab" @click.prevent="tab('settings','tasks')">
+											<i aria-hidden="true" class="fas fa-tasks"></i> Tasks
+										</a>
+									</li>
 								</ul>
-
 							</div>
 						</div>
 						<div class="col-md-9">
@@ -465,7 +463,8 @@ export default {
 				restart_instance: 'Rebooting',
 				destroy_instance: 'Destroying',
 				resume_instance: 'Resuming',
-				suspend_instance: 'Suspending'
+				suspend_instance: 'Suspending',
+				create_snapshot: 'Creating Snapshot'
 			},
 			instance_statuses: {
 				'1': 'Running',
@@ -887,7 +886,7 @@ export default {
 			let pip = "Not Assigned";
 			this.instance.ips.forEach((ip) => {
 				if (ip.primary === 1 && ip.version === 'v6_subnet' && ip.network.type === 'public') {
-					pip = ip.ip
+					pip = ip.ip + '/' + ip.ip_mask
 				}
 			});
 			return pip;
@@ -973,6 +972,10 @@ export default {
 			} else {
 				return this.instance_statuses[this.instance.status.status];
 			}
+		},
+
+		is_migrating(){
+			return this.instance.migration && this.instance.migration.id;
 		}
 	}
 }
