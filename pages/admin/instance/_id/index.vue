@@ -72,8 +72,7 @@
 									<div class="row">
 										<div class="col-md-6">
 											<div class="form-group" :class="{'has-error': errors['storages.0']}">
-												<select2 v-bind:name="'storages['+instance.disks[0].id+']'"
-														 v-bind:allowclear="'false'" v-once></select2>
+												<select2 v-bind:name="'storages['+instance.disks[0].id+']'" v-bind:allowclear="'false'" v-once></select2>
 											</div>
 										</div>
 										<div class="col-md-6">
@@ -234,7 +233,17 @@
 							</div>
 						</div>
 						<div class="row">
-							<div class="col-md-6">
+							<div class="col-md-4">
+								<div class="form-group">
+									<label>Network Driver</label>
+									<select name="nic_type" class="form-control">
+										<option value="virtio">VirtIO</option>
+										<option value="rtl8139">Realtek 8139</option>
+										<option value="e1000">e1000</option>
+									</select>
+								</div>
+							</div>
+							<div class="col-md-4">
 								<div class="form-group">
 									<label>Upload Speed</label>
 									<div class="input-group">
@@ -245,7 +254,7 @@
 									</div>
 								</div>
 							</div>
-							<div class="col-md-6">
+							<div class="col-md-4">
 								<div class="form-group">
 									<label>Download Speed</label>
 									<div class="input-group">
@@ -478,8 +487,7 @@ export default {
 		let hypervisor = await $axios.get('/admin/hypervisors/' + instance.data.hypervisor_id).catch(() => {
 		});
 
-		let public_ipv4 = [], public_ipv6 = [], private_ipv4 = [], storages = [], ips = [], regions = [], diskcount = 0,
-			diskarr = [];
+		let public_ipv4 = [], public_ipv6 = [], private_ipv4 = [], storages = [], ips = [], regions = [], diskcount = 0, diskarr = [];
 
 		instance.data.disks.forEach((disk, k) => {
 			if (k !== 0) {

@@ -41,6 +41,16 @@
 							<span class="help-block" v-if="errors.user_id">{{ errors.user_id[0] }}</span>
 						</div>
 					</div>
+					<div class="form-group row">
+						<div class="col-md-2">
+							<h5>Private Image:</h5>
+						</div>
+						<div class="col-md-3">
+							<input type="checkbox" name="type" value="public"/>
+							<input type="checkbox" name="type" id="private" value="private" :checked="iso.type === 'private'"/>
+							<label class="switchy" for="private"/>
+						</div>
+					</div>
 					<div class="row">
 						<div class="col-md-2"></div>
 						<div class="col-md-4">

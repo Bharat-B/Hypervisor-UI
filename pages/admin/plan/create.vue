@@ -212,12 +212,8 @@
 							<div class="form-group" :class="{'has-error': errors.overage_price}">
 								<label>Bandwidth Overage Price</label>
 								<div class="input-group">
-									<div class="input-group-addon">{{
-											currencySymbol[environment.settings.currency_code]
-										}}
-									</div>
-									<input type="number" name="overage_price" class="form-control"
-										   :disabled="!enabledBilling">
+									<div class="input-group-addon">{{ currencySymbol[environment.settings.currency_code] }}</div>
+									<input type="number" name="overage_price" class="form-control" :disabled="!enabledBilling">
 									<div class="input-group-addon">/GB</div>
 								</div>
 								<span class="help-block" v-if="errors.overage_price">{{ errors.overage_price[0] }}</span>
@@ -237,15 +233,13 @@
 								<input type="number" name="ipv4_count" class="form-control">
 							</div>
 						</div>
-						<div
-							:class="{'col-md-6': bandwidth_overage !== 'billing', 'col-md-4': bandwidth_overage === 'billing'}">
+						<div :class="{'col-md-6': bandwidth_overage !== 'billing', 'col-md-4': bandwidth_overage === 'billing'}">
 							<div class="form-group">
 								<label>IPv6 Count</label>
 								<input type="number" name="ipv6_count" class="form-control">
 							</div>
 						</div>
-						<div
-							:class="{'col-md-6': bandwidth_overage !== 'billing', 'col-md-4': bandwidth_overage === 'billing'}">
+						<div :class="{'col-md-6': bandwidth_overage !== 'billing', 'col-md-4': bandwidth_overage === 'billing'}">
 							<div class="form-group">
 								<label>IPv6 Subnet Count</label>
 								<input type="number" name="ipv6_subnet_count" class="form-control">
@@ -253,7 +247,17 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-md-6">
+						<div class="col-md-4">
+							<div class="form-group">
+								<label>Network Driver</label>
+								<select name="nic_type" class="form-control">
+									<option value="virtio">VirtIO</option>
+									<option value="rtl8139">Realtek 8139</option>
+									<option value="e1000">e1000</option>
+								</select>
+							</div>
+						</div>
+						<div class="col-md-4">
 							<div class="form-group">
 								<label>Upload Speed</label>
 								<div class="input-group">
@@ -264,7 +268,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-md-6">
+						<div class="col-md-4">
 							<div class="form-group">
 								<label>Download Speed</label>
 								<div class="input-group">
@@ -281,10 +285,8 @@
 					<div class="row">
 						<div class="col-md-6">
 							<div class="form-group">
-								<label>Regions</label>
-								<select name="regions[]" class="form-control" multiple="multiple" data-width="100%">
-									<option value=""></option>
-								</select>
+								<label>Snapshot Limit</label>
+								<input type="number" name="snapshot_limit" class="form-control">
 							</div>
 						</div>
 						<div class="col-md-6">
@@ -292,6 +294,16 @@
 								<label>Image Groups</label>
 								<select name="image_groups[]" class="form-control" multiple="multiple"
 										data-width="100%">
+									<option value=""></option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<div class="form-group">
+								<label>Regions</label>
+								<select name="regions[]" class="form-control" multiple="multiple" data-width="100%">
 									<option value=""></option>
 								</select>
 							</div>

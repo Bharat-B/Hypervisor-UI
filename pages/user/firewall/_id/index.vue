@@ -1,6 +1,6 @@
 <template>
 	<div class="dashcontent">
-		<h1><i class="fa fa-wrench" aria-hidden="true"></i> Create Firewall</h1>
+		<h1><i class="fa fa-wrench" aria-hidden="true"></i> Update Firewall</h1>
 		<div class="dashstuff">
 			<div class="col-md-11">
 				<div class="wow fadeIn blocks firewall-manage">

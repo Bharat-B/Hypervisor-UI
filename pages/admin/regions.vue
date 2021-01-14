@@ -28,10 +28,9 @@
 							<td>{{ region.hypervisors.length }}</td>
 							<td>{{ region.plans.length }}</td>
 							<td class="actions">
-								<nuxt-link :to="{name: 'admin-region-id', params: {id: region.id}}" tag="button"
-										   class="btn btn-default"><i class="fa fa-edit" aria-hidden="true"></i>
+								<nuxt-link :to="{name: 'admin-region-id', params: {id: region.id}}" tag="button" class="btn btn-default"><i class="fa fa-edit" aria-hidden="true"></i>
 								</nuxt-link>
-								<button class="btn btn-default"><i class="fa fa-trash" aria-hidden="true"></i></button>
+								<button class="btn btn-default" @click.prevent="destroy(region)"><i class="fa fa-trash" aria-hidden="true"></i></button>
 							</td>
 						</tr>
 						</tbody>

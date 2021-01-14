@@ -32,8 +32,8 @@
 		<div class="dashstuff">
 			<div class="col-md-10">
 				<div v-if="firewalls.data.length > 0" class="wow fadeIn blocks firewall-manage">
-					<input v-model="pagination_search" placeholder="Search Firewall.." type="search"
-						   @keyup.enter="search">
+					<input v-model="pagination_search" placeholder="Search Firewall.." type="search" @keyup.enter="search">
+					<br><br>
 					<div class="table-responsive">
 						<table class="table">
 							<thead>
@@ -55,12 +55,10 @@
 								<td><p>{{ firewall.created_at }}</p></td>
 								<td>
 									<nuxt-link :to="{ name: 'user-firewall-id', params: {id: firewall.id} }">
-										<button class="btn btn-default"><i aria-hidden="true"
-																		   class="fa fa-terminal famore"></i> Edit
-										</button>
+										<button class="btn btn-default"><i aria-hidden="true" class="fa fa-terminal famore"></i> Edit</button>
 									</nuxt-link>
-									<button class="btn btn-default" @click.prevent=""><i aria-hidden="true"
-																						 class="fa fa-trash"></i>
+									<button class="btn btn-default" @click.prevent="destroy(firewall.id)">
+										<i aria-hidden="true" class="fa fa-trash"></i>
 									</button>
 								</td>
 							</tr>
@@ -116,7 +114,7 @@ export default {
 		if (route.query && route.query.search !== '') {
 			pagination_search = route.query.search;
 		}
-		return $axios.get('user/firewalls', {
+		return $axios.get('/user/firewalls', {
 			params: {
 				page: pagination_store.no,
 				per_page: pagination_store.items,
@@ -134,6 +132,20 @@ export default {
 		});
 	},
 	methods: {
+		getFirewalls(){
+			let vm = this;
+			$axios.get('/user/firewalls', {
+				params: {
+					page: vm.$route.query.page ? vm.$route.query.page : 1,
+					per_page: vm.$route.query.per_page ? vm.$route.query.per_page : 1,
+					search: vm.$route.query.search !== '' ? vm.$route.query.search : ''
+				}
+			}).then((response) => {
+				vm.$set(vm,"firewalls",response.data);
+			}).catch((error) => {
+
+			});
+		},
 		page(a, b, c = '') {
 			this.$router.replace({
 				name: this.$route.name, query: {
@@ -152,14 +164,14 @@ export default {
 				}
 			})
 		},
-		destroy(firewall) {
+		destroy(id) {
 			let vm = this;
 			bootbox.confirm({
-				title: "Are you sure you want to remove this Firewall?",
+				title: "Are you sure you want to delete this firewall?",
 				message: "Please note that no further confirmations will appear!",
 				buttons: {
 					confirm: {
-						label: '<i class="fa fa-check"></i>Remove Plan',
+						label: '<i class="fa fa-check"></i>Delete Firewall',
 						className: 'btn-success'
 					},
 					cancel: {
@@ -169,17 +181,12 @@ export default {
 				},
 				callback: function (result) {
 					if (result) {
-						vm.$axios.delete('/user/firewall/' + plan.id).then(async (response) => {
-							await vm.$axios.get('/user/firewalls', {
-								params: {
-									page: vm.route.query.page ? vm.route.query.page : 1,
-									per_page: vm.route.query.per_page ? vm.route.query.per_page : 20,
-									search: vm.route.query.pagination_search ? vm.route.query.pagination_search : ''
-								}
-							}).then((response) => {
-								vm.$set(vm, "firewalls", response.data);
-							})
+						vm.$axios.delete('/user/firewall/' + id).then((response) => {
+							setTimeout(()=>{
+								vm.getFirewalls()
+							},2000);
 						}).catch((error) => {
+
 						});
 					}
 				}

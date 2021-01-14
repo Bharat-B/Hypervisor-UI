@@ -144,7 +144,7 @@
 							<span class="help-block" v-if="errors.overcommit_ram">{{ errors.overcommit_ram[0] }}</span>
 						</div>
 					</div>
-					<!--<div class="row">
+					<div class="row">
 						<div class="col-md-3">
 							<h5>SSH Key:</h5>
 						</div>
@@ -152,7 +152,7 @@
 							<textarea class="form-control" name="ssh_key" cols="30" rows="10" v-model="hypervisor.ssh_key"></textarea>
 							<span class="help-block" v-if="errors.ssh_key">{{ errors.ssh_key[0] }}</span>
 						</div>
-					</div>-->
+					</div>
 					<div class="row">
 						<div class="col-md-3">
 							<h5>Manual Lock:</h5>
@@ -162,9 +162,27 @@
 							<input type="checkbox" name="manually_locked" id="manual_lock" value="1"
 								   :checked="hypervisor.manually_locked === 1"/>
 							<label class="switchy" for="manual_lock"></label>
-							<span class="help-block" v-if="errors.manually_locked">{{
-									errors.manually_locked[0]
-								}}</span>
+							<span class="help-block" v-if="errors.manually_locked">{{ errors.manually_locked[0] }}</span>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-3">
+							<h5>Enable Snapshots:</h5>
+						</div>
+						<div class="form-group col-md-3" :class="{'has-error': errors.enable_snapshots}">
+							<input type="hidden" name="enable_snapshots" value="0">
+							<input type="checkbox" name="enable_snapshots" id="enable_snapshots" value="1" :checked="hypervisor.enable_snapshots === 1"/>
+							<label class="switchy" for="enable_snapshots"></label>
+							<span class="help-block" v-if="errors.enable_snapshots">{{ errors.enable_snapshots[0] }}</span>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-3">
+							<h5>Snapshots Path:</h5>
+						</div>
+						<div class="form-group col-md-3" :class="{'has-error': errors.snapshot_path}">
+							<input type="text" name="snapshot_path" class="form-control" v-model="hypervisor.snapshot_path">
+							<span class="help-block" v-if="errors.snapshot_path">{{ errors.snapshot_path[0] }}</span>
 						</div>
 					</div>
 					<div class="row">

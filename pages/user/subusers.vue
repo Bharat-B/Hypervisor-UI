@@ -31,6 +31,7 @@
 			<div class="col-md-10">
 				<div class="wow fadeIn blocks firewall-manage snapshots" v-if="subusers.data.length >= 1">
 					<input type="search" placeholder="Search User" v-model="pagination_search" @keyup.enter="search"/>
+					<br><br>
 					<div class="table-responsive">
 						<table class="table snapshotslist">
 							<thead>
@@ -82,7 +83,7 @@ export default {
 	layout: 'user',
 	data() {
 		return {
-			getRoute: "user/reseller/subusers",
+			getRoute: "/user/reseller/subusers",
 			pagination_search: "",
 			pagination_store: {no: 1, items: 20},
 			subusers: {
@@ -100,7 +101,7 @@ export default {
 		if (route.query && route.query.search !== '') {
 			pagination_search = route.query.search;
 		}
-		return $axios.get('user/reseller/subusers', {
+		return $axios.get('/user/reseller/subusers', {
 			params: {
 				page: pagination_store.no,
 				per_page: pagination_store.items,
@@ -111,7 +112,7 @@ export default {
 				subusers: response.data,
 				pagination_search: pagination_search,
 				pagination_store: pagination_store,
-				getRoute: "user/reseller/subusers"
+				getRoute: "/user/reseller/subusers"
 			}
 		}).catch((error) => {
 
@@ -138,12 +139,30 @@ export default {
 		},
 		destroy(id) {
 			let vm = this;
-			vm.$axios.delete('user/reseller/subuser/' + id).then((response) => {
-				setTimeout(() => {
-					vm.search();
-				},2000);
-			}).catch((error) => {
+			bootbox.confirm({
+				title: "Are you sure you want to delete this subuser?",
+				message: "Please note that no further confirmations will appear!",
+				buttons: {
+					confirm: {
+						label: '<i class="fa fa-check"></i>Delete Subuser',
+						className: 'btn-success'
+					},
+					cancel: {
+						label: 'Cancel',
+						className: 'btn-warning'
+					}
+				},
+				callback: function (result) {
+					if (result) {
+						vm.$axios.delete('/user/reseller/subuser/' + id).then((response) => {
+							setTimeout(()=>{
+								vm.search()
+							},2000);
+						}).catch((error) => {
 
+						});
+					}
+				}
 			});
 		}
 	}

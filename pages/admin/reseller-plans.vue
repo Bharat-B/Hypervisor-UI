@@ -40,17 +40,13 @@
 							<td>{{ reseller_plan.users.length }}</td>
 							<td v-show="enabledBilling">{{ $currencyFormat(reseller_plan.price) }}</td>
 							<td class="actions">
-								<nuxt-link tag="button"
-										   :to="{name: 'admin-reseller-plan-create', query: {duplicate: reseller_plan.id}}"
-										   class="btn btn-default">
+								<nuxt-link tag="a" :to="{name: 'admin-reseller-plan-create', query: {duplicate: reseller_plan.id}}" class="btn btn-default">
 									<i class="far fa-copy"></i>
 								</nuxt-link>
-								<nuxt-link tag="button"
-										   :to="{name: 'admin-reseller-plan-id', params:{id: reseller_plan.id}}"
-										   class="btn btn-default"><i class="fa fa-edit" aria-hidden="true"></i>
+								<nuxt-link tag="a" :to="{name: 'admin-reseller-plan-id', params:{id: reseller_plan.id}}" class="btn btn-default">
+									<i class="fa fa-edit" aria-hidden="true"></i>
 								</nuxt-link>
-								<button class="btn btn-default" @click.prevent="destroy(reseller_plan.id)"><i
-									class="fa fa-trash" aria-hidden="true"></i></button>
+								<button class="btn btn-default" @click.prevent="destroy(reseller_plan.id)"><i class="fa fa-trash" aria-hidden="true"></i></button>
 							</td>
 						</tr>
 						</tbody>

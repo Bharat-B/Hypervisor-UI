@@ -65,9 +65,7 @@
 										</h4>
 									</div>
 								</a>
-								<div :id="'instance-'+instance.id" class="panel-collapse"
-									 :class="{'collapse in': $index === 0, 'collapse': $index !== 0}" role="tabpanel"
-									 aria-labelledby="headingLast">
+								<div :id="'instance-'+instance.id" class="panel-collapse" :class="{'collapse in': $index === 0, 'collapse': $index !== 0}" role="tabpanel" aria-labelledby="headingLast">
 									<div class="panel-body">
 										<div class="row">
 											<div class="col-md-3">
@@ -90,19 +88,13 @@
 											</div>
 											<div class="col-md-3">
 												<a :href="'/user/instance/'+instance.id">
-													<button class="btn btn-default"><i class="fas fa-sliders-h"
-																					   aria-hidden="true"></i> Manage
-													</button>
+													<button class="btn btn-default"><i class="fas fa-sliders-h" aria-hidden="true"></i> Manage</button>
 												</a>
 											</div>
 										</div>
-										<div class="newinstancecreation"
-											 v-if="instance.created === 0 && ['create_instance','rebuild_instance'].indexOf(task.action) !== -1"
-											 v-for="task in instance.tasks" :id="'task-'+task.id">
+										<div class="newinstancecreation" v-if="instance.created === 0 && ['create_instance','rebuild_instance'].indexOf(task.action) !== -1" v-for="task in instance.tasks" :id="'task-'+task.id">
 											<div class="progress">
-												<div class="progress-bar progress-bar-striped active" role="progressbar"
-													 :aria-valuenow="task.progress" aria-valuemin="0"
-													 aria-valuemax="100" :style="'width: '+task.progress+'%'">
+												<div class="progress-bar progress-bar-striped active" role="progressbar" :aria-valuenow="task.progress" aria-valuemin="0" aria-valuemax="100" :style="'width: '+task.progress+'%'">
 													<p class="less">{{ tasks[task.action] }} {{ task.progress }}%</p>
 													<span class="sr-only">{{ task.progress }}%</span>
 												</div>
@@ -121,8 +113,7 @@
 				</div>
 				<div class="col-md-4">
 					<div class="wow fadeIn blocks wb">
-						<h5>Welcome back, <a href="/profile"><b>{{ user.first_name }}</b></a>! <i class="far fa-smile"
-																								  aria-hidden="true"></i>
+						<h5>Welcome back, <a href="/profile"><b>{{ user.first_name }}</b></a>! <i class="far fa-smile" aria-hidden="true"></i>
 						</h5>
 						<p class="text-center">You have</p>
 						<div class="circlestats">
@@ -142,13 +133,14 @@
 					<div class="wow fadeIn blocks logs">
 						<h3>Account Activity</h3>
 						<ul>
-							<li v-for="activity in user.activity"><p><span><i class="fas fa-circle"
-																			  aria-hidden="true"></i> {{
-									activity.event
-								}} from:
-                            {{ activity.ip }}</span> &nbsp; <b class="less"><i class="far fa-clock"
-																			   aria-hidden="true"></i>
-								{{ activity.created_at }} </b></p></li>
+							<li v-for="activity in user.activity">
+								<p>
+									<span>
+										<i class="fas fa-circle" aria-hidden="true"></i> {{ activity.event }} from: {{ activity.ip }}
+									</span> &nbsp;
+									<b class="less"><i class="far fa-clock" aria-hidden="true"></i>{{ activity.created_at }} </b>
+								</p>
+							</li>
 						</ul>
 					</div>
 				</div>
@@ -260,33 +252,37 @@ export default {
 		},
 		async update_tasks() {
 			let vm = this, end = ['done', 'failed'];
-			if (vm.poll_tasks.length >= 1) {
-				let response = await vm.$axios.get('/user/tasks', {
+			if (vm.poll_tasks !== null && vm.poll_tasks.length >= 1) {
+				let tasks = await vm.$axios.get('/user/tasks', {
 					params: {
 						tasks: vm.poll_tasks.join(',')
 					}
 				}).catch((error) => {
 
 				});
-				response.data.forEach((task) => {
+				tasks.data.forEach((task) => {
 					vm.instances.data.forEach((instance, ik) => {
 						if (instance.id === task.instance_id) {
-							vm.poll_tasks.forEach(async (task_id, tk) => {
-								if (task_id === task.id) {
-									vm.$set(vm.instances.data[ik].tasks, tk, task);
-									if ($.inArray(task.status, end) !== -1) {
-										let response = await vm.$axios.get('/user/instances/' + task.instance_id);
-										vm.poll_tasks.splice(vm.poll_tasks.index(task_id), 1);
-										vm.$set(vm.instances.data[ik], "running_task", false);
-										vm.$set(vm.instances.data, ik, response.data);
+							setTimeout(() => {
+								vm.instances.data[ik].tasks.forEach(async (domtask, domid) => {
+									if (domtask.id === task.id) {
+										vm.$set(vm.instances.data[ik].tasks, domid, task);
+										if (end.indexOf(task.status) !== -1) {
+											vm.poll_tasks.splice(vm.poll_tasks.indexOf(task.id), 1);
+											let response = await vm.$axios.get('/user/instances/' + task.instance_id);
+											if (response) {
+												vm.$set(vm.instances.data, ik, response.data);
+												vm.$set(vm.instances.data[ik], 'running_task', false);
+											}
+										}
 									}
-								}
+								});
 							});
 						}
 					});
 				});
 			}
-			if (vm.poll_tasks.length <= 0) {
+			if (vm.poll_tasks !== null && vm.poll_tasks.length <= 0) {
 				clearInterval(vm.polling);
 			}
 		},

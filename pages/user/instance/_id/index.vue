@@ -16,7 +16,7 @@
 				<i aria-hidden="true" class="fa fa-stop"></i> <span>Stop</span>
 			</a>
 			<a :class="{disabled: disableAction || instance_suspended || instance_network_suspended }" data-placement="bottom" data-toggle="tooltip" href="#" title="Restart this server" @click.prevent="action('restart')">
-				<i aria-hidden="true" class="fas fa-redo"></i><span>Restart</span>
+				<i aria-hidden="true" class="fas fa-redo"></i> <span>Restart</span>
 			</a>
 			<a :class="{disabled:  disableAction || instance_stopped }" data-placement="bottom" data-toggle="tooltip" href="#" title="Open console" @click.prevent="novnc">
 				<i aria-hidden="true" class="fa fa-terminal"></i> <span>Console</span>
@@ -261,17 +261,14 @@
 										<div class="col-md-5">
 											<p><b>Disk Driver</b>:</p>
 											<br>
-											<select v-model="disk_driver" class="js-example-basic-single form-control"
-													data-width="100%" name="driver">
-												<option value="default">IDE</option>
+											<select v-model="disk_driver" class="js-example-basic-single form-control" data-width="100%" name="driver">
 												<option value="virtio">Virtio</option>
+												<option value="virtio-scsi">Virtio SCSI</option>
+												<option value="ide">IDE</option>
 												<option value="scsi">SCSI</option>
 											</select>
 											<br>
-											<button :disabled="disableAction" class="btn btn-primary" role="button"
-													type="button" @click.prevent="change_driver()">Save
-												Changes
-											</button>
+											<button :disabled="disableAction" class="btn btn-primary" role="button" type="button" @click.prevent="change_driver()">Save Changes</button>
 										</div>
 									</div>
 									<br>
@@ -512,13 +509,9 @@
 
 									<p v-if="instance.enabled_rescue !== 0">Password: {{ instance.rescue_password }}</p>
 
-									<button v-if="instance.enabled_rescue === 0" :disabled="disableAction || instance_suspended || instance_network_suspended"
-											class="btn btn-success"
-											@click.prevent="action('enable_rescue')">Enable Rescue Mode
+									<button v-if="instance.enabled_rescue === 0" :disabled="disableAction || instance_suspended || instance_network_suspended" class="btn btn-success" @click.prevent="action('enable_rescue')">Enable Rescue Mode
 									</button>
-									<button v-else :disabled="disableAction || instance_suspended || instance_network_suspended"
-											class="btn btn-danger"
-											@click="action('disable_rescue')">Disable Rescue Mode
+									<button v-else :disabled="disableAction || instance_suspended || instance_network_suspended" class="btn btn-danger" @click="action('disable_rescue')">Disable Rescue Mode
 									</button>
 									<br>
 								</div>
@@ -595,6 +588,18 @@
 								</div>
 							</div>
 							<div class="col-md-4">
+								<div class="form-group">
+									<label>Network Driver</label>
+									<select name="nic_type" class="form-control" v-model="instance.nic_type">
+										<option value="virtio">VirtIO</option>
+										<option value="rtl8139">Realtek 8139</option>
+										<option value="e1000">e1000</option>
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-4">
 								<div :class="{'has-error': errors.ipv4_count}" class="form-group">
 									<label> IPv4 Addresses</label>
 									<div class="input-group">
@@ -607,8 +612,6 @@
 									<span v-if="errors.ipv4_count" class="help-block">{{ errors.ipv4_count[0] }}</span>
 								</div>
 							</div>
-						</div>
-						<div class="row">
 							<div class="col-md-4">
 								<div :class="{'has-error': errors.ipv6_count}" class="form-group">
 									<label> IPv6 Addresses</label>
@@ -632,8 +635,7 @@
 											{{ reseller_limits.ipv6_subnet_count }}
 										</div>
 									</div>
-									<span v-if="errors.ipv6_subnet_count"
-										  class="help-block">{{ errors.ipv6_subnet_count[0] }}</span>
+									<span v-if="errors.ipv6_subnet_count" class="help-block">{{ errors.ipv6_subnet_count[0] }}</span>
 								</div>
 							</div>
 						</div>
@@ -717,7 +719,7 @@ export default {
 	},
 	methods: {
 		async get_instance() {
-			await this.$axios.get('user/instances/' + this.$route.params.id).then((response) => {
+			await this.$axios.get('/user/instances/' + this.$route.params.id).then((response) => {
 				this.instance = response.data;
 				this.update_tasks();
 			}).catch((error) => {
@@ -742,7 +744,7 @@ export default {
 			}
 		},
 		async get_images() {
-			let response = await this.$axios.get('user/images').catch(() => {
+			let response = await this.$axios.get('/user/images').catch(() => {
 			});
 			if (response) {
 				let images = {}, imageselect = [];
@@ -1167,6 +1169,14 @@ export default {
 				text: vm.instance.firewall.name,
 				selected: true
 			}] : []
+		});
+		let nic_types = {virtio: "VirtIO", e1000: "E1000", rtl8139: "Realtek 8139"};
+		$('[name="nic_type"]').select2({
+			data: [{
+				id: vm.instance.nic_type,
+				text: nic_types[vm.instance.nic_type],
+				selected: true
+			}]
 		});
 		$('[name="user_id"]').select2({
 			placeholder: 'Select User',

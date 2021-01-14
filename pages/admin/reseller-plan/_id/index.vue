@@ -26,9 +26,7 @@
 								<label> Instance Count</label>
 								<input type="number" name="instance_count" class="form-control"
 									   v-model="reseller_plan.instance_count">
-								<span class="help-block" v-if="errors.instance_count">{{
-										errors.instance_count[0]
-									}}</span>
+								<span class="help-block" v-if="errors.instance_count">{{errors.instance_count[0]}}</span>
 							</div>
 						</div>
 					</div>
@@ -50,8 +48,7 @@
 						<div class="col-md-6">
 							<div class="form-group">
 								<label> CPU Cores</label>
-								<input type="number" name="cpu_cores" class="form-control"
-									   v-model="reseller_plan.cpu_cores">
+								<input type="number" name="cpu_cores" class="form-control" v-model="reseller_plan.cpu_cores">
 							</div>
 						</div>
 					</div>
@@ -59,8 +56,7 @@
 						<div class="col-md-6">
 							<div class="form-group">
 								<label> CPU Units</label>
-								<input type="number" name="cpu_units" class="form-control"
-									   v-model="reseller_plan.cpu_units">
+								<input type="number" name="cpu_units" class="form-control" v-model="reseller_plan.cpu_units">
 							</div>
 						</div>
 						<div class="col-md-6">
@@ -272,7 +268,13 @@
 					<br>
 					<h4>Other Settings</h4>
 					<div class="row">
-						<div :class="{'col-md-4': enabledBilling, 'col-md-6': !enabledBilling}">
+						<div class="col-md-6">
+							<div class="form-group">
+								<label>Snapshot Limit</label>
+								<input type="number" name="snapshot_limit" class="form-control" v-model="reseller_plan.snapshot_limit">
+							</div>
+						</div>
+						<div class="col-md-6">
 							<div class="form-group">
 								<label>Regions</label>
 								<select name="regions[]" class="form-control" multiple="multiple" data-width="100%">
@@ -280,7 +282,9 @@
 								</select>
 							</div>
 						</div>
-						<div :class="{'col-md-4': enabledBilling, 'col-md-6': !enabledBilling}">
+					</div>
+					<div class="row">
+						<div class="col-md-6">
 							<div class="form-group">
 								<label>Image Groups</label>
 								<select name="image_groups[]" class="form-control" multiple="multiple"
@@ -289,7 +293,7 @@
 								</select>
 							</div>
 						</div>
-						<div class="col-md-4" v-if="enabledBilling">
+						<div class="col-md-6" v-if="enabledBilling">
 							<div class="form-group" :class="{'has-error': errors.price}">
 								<label>Price</label>
 								<div class="input-group">

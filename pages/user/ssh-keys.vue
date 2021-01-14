@@ -32,6 +32,7 @@
 			<div class="col-md-10">
 				<div class="wow fadeIn blocks firewall-manage recipes" v-if="keys.data.length >= 1">
 					<input type="search" placeholder="Search Keys" v-model="pagination_search" @keyup.enter="search"/>
+					<br><br>
 					<div class="table-responsive">
 						<table class="table recipeslist">
 							<thead>
@@ -44,9 +45,7 @@
 							<tbody>
 							<tr v-for="key in keys.data">
 								<td>
-									<nuxt-link :to="{ name: 'user-ssh-key-id', params: {id: key.id} }"><p>{{
-											key.name
-										}}</p></nuxt-link>
+									<nuxt-link :to="{ name: 'user-ssh-key-id', params: {id: key.id} }"><p>{{ key.name }}</p></nuxt-link>
 								</td>
 								<td><p>{{ key.created_at }}</p></td>
 								<td>
@@ -147,11 +146,32 @@ export default {
 			})
 		},
 		destroy(id) {
-			this.$axios.delete('user/ssh-key/' + id).then((response) => {
+			let vm = this;
+			bootbox.confirm({
+				title: "Are you sure you want to delete this ssh key?",
+				message: "Please note that no further confirmations will appear!",
+				buttons: {
+					confirm: {
+						label: '<i class="fa fa-check"></i>Delete SSH Key',
+						className: 'btn-success'
+					},
+					cancel: {
+						label: 'Cancel',
+						className: 'btn-warning'
+					}
+				},
+				callback: function (result) {
+					if (result) {
+						vm.$axios.delete('user/ssh-key/' + id).then((response) => {
+							setTimeout(()=>{
+								vm.search()
+							},2000);
+						}).catch((error) => {
 
-			}).catch((error) => {
-
-			})
+						});
+					}
+				}
+			});
 		}
 	}
 }

@@ -1,5 +1,4 @@
 const webpack = require("webpack");
-
 export default {
     mode: 'universal',
     /*
@@ -32,6 +31,8 @@ export default {
         '~plugins/axios',
         '~plugins/custom',
         '~plugins/vue-chartkick',
+		'~plugins/bootstrap.js',
+		{ src: '~plugins/codemirror.js', mode: 'client'}
     ],
     /*
     ** Nuxt.js dev-modules
@@ -49,6 +50,7 @@ export default {
 
     publicRuntimeConfig: {
         API_URL: process.env.API_URL || '/api/v1',
+		NODE_TLS_REJECT_UNAUTHORIZED: '0'
     },
 
     privateRuntimeConfig: {
@@ -57,7 +59,8 @@ export default {
         REDIS_HOST: process.env.REDIS_HOST || '127.0.0.1',
         REDIS_PORT: process.env.REDIS_PORT || 6379,
         REDIS_USER: process.env.REDIS_USER,
-        REDIS_USERPWD: process.env.REDIS_USERPWD
+        REDIS_USERPWD: process.env.REDIS_USERPWD,
+		NODE_TLS_REJECT_UNAUTHORIZED: '0'
     },
 
     /*
@@ -107,7 +110,7 @@ export default {
     */
     build: {
 
-
+		vendor: ['jquery','bootstrap','bootbox','select2','pace','codemirror'],
 
         /*
         ** You can extend webpack config here
@@ -118,7 +121,12 @@ export default {
 
 		plugins: [
 			new webpack.ProvidePlugin({
-
+				$: 'jquery',
+				jQuery: 'jquery',
+				'window.jQuery': 'jquery',
+				bootbox: 'bootbox',
+				select2: 'select2',
+				pace: 'pace'
 			})
 		],
     },

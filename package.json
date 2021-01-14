@@ -15,9 +15,16 @@
     "@nuxtjs/auth": "^4.8.5",
     "@nuxtjs/axios": "^5.9.5",
     "accounting": "^0.4.1",
+    "bootbox": "^5.4.0",
+    "bootstrap": "^3.3.7",
     "chart.js": "^2.9.4",
+    "codemirror": "^5.54.0",
     "ioredis": "^4.16.0",
+    "jquery": "^3.4.1",
     "nuxt": "^2.14.4",
+    "pace": "0.0.4",
+    "select2": "^4.0.5",
+    "tidy-html5": "^0.1.1",
     "vue-chartkick": "^0.6.1"
   },
   "devDependencies": {}

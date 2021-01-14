@@ -127,9 +127,7 @@
 											</div>
 										</div>
 									</div>
-									<disk v-for="$disk in diskarr" v-bind:disk="$disk" v-bind:id="'disk'+$disk"
-										  v-bind:storages="storages" v-bind:instance="instance"
-										  v-on:removedisk="removeDisk" :key="$disk"></disk>
+									<disk v-for="$disk in diskarr" v-bind:disk="$disk" v-bind:storages="storages" v-bind:instance="instance" v-on:removedisk="removeDisk" :key="$disk"></disk>
 								</div>
 							</div>
 						</div>
@@ -268,7 +266,17 @@
 							</div>
 						</div>
 						<div class="row">
-							<div class="col-md-6">
+							<div class="col-md-4">
+								<div class="form-group">
+									<label>Network Driver</label>
+									<select name="nic_type" class="form-control">
+										<option value="virtio">VirtIO</option>
+										<option value="rtl8139">Realtek 8139</option>
+										<option value="e1000">e1000</option>
+									</select>
+								</div>
+							</div>
+							<div class="col-md-4">
 								<div class="form-group">
 									<label>Upload Speed</label>
 									<div class="input-group">
@@ -279,7 +287,7 @@
 									</div>
 								</div>
 							</div>
-							<div class="col-md-6">
+							<div class="col-md-4">
 								<div class="form-group">
 									<label>Download Speed</label>
 									<div class="input-group">
@@ -398,10 +406,7 @@
                                     <div class="form-group" :class="{'has-error': errors.overage_price}">
                                         <label>Price</label>
                                         <div class="input-group">
-                                            <div class="input-group-addon">{{
-													currencySymbol[environment.settings.currency_code]
-												}}
-                                            </div>
+                                            <div class="input-group-addon">{{ currencySymbol[environment.settings.currency_code] }}</div>
                                             <input type="number" name="price" class="form-control" value="0.00"
 												   :disabled="!enabledBilling">
                                             <div class="input-group-addon">/mo</div>

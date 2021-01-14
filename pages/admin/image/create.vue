@@ -44,6 +44,16 @@
 							<span class="help-block" v-if="errors.distro">{{ errors.distro[0] }}</span>
 						</div>
 					</div>
+					<div class="form-group row">
+						<div class="col-md-2">
+							<h5>Private Image:</h5>
+						</div>
+						<div class="col-md-3">
+							<input type="checkbox" name="type" value="public"/>
+							<input type="checkbox" name="type" id="private" value="private"/>
+							<label class="switchy" for="private"/>
+						</div>
+					</div>
 					<button class="btn btn-primary" type="submit" :disabled="processing">
 						<i v-if="!processing" class="fa fa-plus" aria-hidden="true"></i>
 						<i v-else class="fa fa-spin fa-spinner"></i>

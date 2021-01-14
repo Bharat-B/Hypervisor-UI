@@ -60,7 +60,7 @@
 								<span v-if="instance.running_task">
 									<label v-if="( instance.created === 0 || instance.created === 1 )">
 										<span v-for="task in instance.tasks" v-if="['done','failed'].indexOf(task.status) === -1" class="label label-info">
-											<i class="fa fa-spin fa-spinner"></i> {{ tasks[task.action] }}
+											<i class="fa fa-spin fa-spinner"></i> {{ task.progress }}% {{ tasks[task.action] }}
 										</span>
 									</label>
 									<label v-else-if="is_migrating(instance)" class="label label-info"><i class="fa fa-spin fa-spinner"></i> Migrating</label>
@@ -122,6 +122,7 @@
 						<select class="form-control" data-width="100%" name="action" @change.prevent="do_mass_action">
 							<option value="">Select Action</option>
 							<option value="start">Start</option>
+							<option value="restart">Restart</option>
 							<option value="stop">Stop</option>
 							<option value="shutdown">Poweroff</option>
 							<option value="suspend">Suspend</option>
@@ -179,6 +180,19 @@ export default {
 		},
 		'instance_pagination.per_page': function () {
 			this.search();
+		},
+		'instance_pagination.instances.data': function(data) {
+			let vm = this, end = ['done', 'failed'];
+			data.forEach((instance, k) => {
+				instance.tasks.forEach((task) => {
+					if(end.indexOf(task.status) === -1){
+						vm.$set(vm.instance_pagination.instances.data[k],'running_task',true);
+						if(vm.poll_tasks.indexOf(task.id) === -1){
+							vm.poll_tasks.push(task.id)
+						}
+					}
+				})
+			});
 		}
 	},
 	data() {
@@ -319,10 +333,10 @@ export default {
 		is_network_suspended(instance) {
 			return instance.suspended_network === 1;
 		},
+
 		unknown_suspended_state(instance) {
 			return instance.status && instance.status.status === 2 || instance.suspended === 2;
 		},
-
 		do_mass_action() {
 			let vm = this, action = $('[name="action"]').val();
 			vm.$store.dispatch('clearAlerts', {has: false});
@@ -350,18 +364,18 @@ export default {
 						}
 					},
 					callback: function (result) {
+
 						if (result) {
-							clearInterval(this.polling);
+
+							clearInterval(vm.polling);
+
 							vm.selected_instances.forEach(async (instance, k) => {
 								vm.$set(vm.instance_pagination.instances.data[k], 'processing', true);
-								vm.$axios.post('/admin/instance/' + instance, {action: action}).then((response) => {
-									if (response && response.data.task_id) {
-										vm.initiated.push(response.data.task_id);
-									}
-								}).catch((error) => {
-									vm.$set(vm.instance_pagination.instances.data[k], 'processing', false);
-								});
+								vm.$set(vm.instance_pagination.instances.data[k], 'running_task', true);
 							});
+
+							vm.$axios.post('/admin/instances/action', {action: action, instances: vm.selected_instances.join(',')});
+
 							setTimeout(() => {
 								vm.get_instances();
 							}, 10000);
@@ -375,23 +389,109 @@ export default {
 			this.$set(this.instance_pagination.instances.data[index], 'processing', true);
 			let result = await this.$axios.post('/admin/instance/' + instance.id, {action: action}).catch((error) => {
 				this.$set(this.instance_pagination.instances.data[index], 'processing', false);
+				this.$set(this.instance_pagination.instances.data[index], 'running_task', false);
 			});
 			if (result && result.data.task_id) {
 				this.initiated.push(result.data.task_id);
+				this.$set(this.instance_pagination.instances.data[index],'tasks', result.data.instance.tasks);
+				this.$set(this.instance_pagination.instances.data[index], 'processing', true);
+				this.$set(this.instance_pagination.instances.data[index], 'running_task', true);
+				this.do_polling();
 			}
-			this.do_polling();
+		},
+
+		do_polling() {
+			let vm = this;
+			clearInterval(vm.polling);
+			vm.instance_pagination.instances.data.forEach((instance, ik) => {
+				if (instance.tasks.length > 0) {
+					instance.tasks.forEach((task, tk) => {
+						if (vm.initiated.indexOf(task.id) !== -1) {
+							if (task.status === 'failed') {
+								bootbox.alert("Instance " + instance.name + " - " + vm.tasks[task.action] + " " + task.status + "<br /><div class='col-md-12' style='overflow: scroll; height:200px;background-color: #000;'>" + task.message.toString().replace(/\n/g, "<br />") + "</div>");
+								vm.initiated.splice(vm.initiated.indexOf(task.id), 1);
+							}
+						}
+						if (['failed', 'done'].indexOf(task.status) === -1) {
+							if(vm.poll_tasks.indexOf(task.id) === -1){
+								vm.poll_tasks.push(task.id)
+							}
+							vm.$set(vm.instance_pagination.instances.data[ik], 'running_task', true);
+						}
+					})
+				}
+			});
+			vm.polling = setInterval(() => {
+				vm.update_tasks()
+			}, 5000);
+		},
+
+		async update_tasks() {
+			let vm = this, end = ['done', 'failed'];
+
+			if (vm.poll_tasks !== null && vm.poll_tasks.length >= 1) {
+				let tasks = await vm.$axios.get('/admin/tasks', {
+					params: {
+						tasks: vm.poll_tasks.join(',')
+					}
+				}).catch((error) => {
+
+				});
+				tasks.data.forEach((task) => {
+					vm.instance_pagination.instances.data.forEach((instance, ik) => {
+						if (instance.id === task.instance_id) {
+							setTimeout(() => {
+								vm.instance_pagination.instances.data[ik].tasks.forEach(async (domtask, domid) => {
+									if (domtask.id === task.id) {
+										vm.$set(vm.instance_pagination.instances.data[ik].tasks, domid, task);
+										if (end.indexOf(task.status) !== -1) {
+											vm.poll_tasks.splice(vm.poll_tasks.indexOf(task.id), 1);
+											if (task.status === 'failed') {
+												bootbox.alert("Instance " + instance.name + " - " + vm.tasks[task.action] + " " + task.status + "<br /><div class='col-md-12' style='overflow: scroll; height:200px;background-color: #000;'>" + task.message.toString().replace(/\n/g, "<br />") + "</div>");
+											}
+											vm.$axios.get('/admin/instances/' + task.instance_id).then((response)=>{
+												vm.$set(vm.instance_pagination.instances.data, ik, response.data);
+											}).catch((error) => {
+												if(error.statusCode === 404){
+													vm.get_instances();
+												}
+											})
+											vm.$set(vm.instance_pagination.instances.data[ik], 'running_task', false);
+											vm.$set(vm.instance_pagination.instances.data[ik], 'processing', false);
+										}
+									}
+								});
+							}, 5000);
+						}
+					});
+				});
+			} else if (vm.poll_tasks !== null && vm.poll_tasks.length <= 0) {
+				clearInterval(vm.polling);
+			}
 		},
 
 		async get_instances() {
 
+			let vm = this, end = ['done', 'failed'];
+
+			$('[name="action"]').val("").trigger('change');
+
 			let response = await this.$axios.get('/admin/instances', {
 				params: {
-					page: this.$route.query.page ? this.$route.query.page : 1,
-					per_page: this.$route.query.per_page ? this.$route.query.per_page : 20,
-					search: this.$route.query.search ? this.$route.query.search : '',
-					status: this.$route.query.status,
-					hypervisor_id: this.$route.query.hypervisor_id
+					page: vm.$route.query.page ? vm.$route.query.page : 1,
+					per_page: vm.$route.query.per_page ? vm.$route.query.per_page : 20,
+					search: vm.$route.query.search ? vm.$route.query.search : '',
+					status: vm.$route.query.status,
+					hypervisor_id: vm.$route.query.hypervisor_id
 				}
+			});
+
+			response.data.forEach((instance, k) => {
+				instance.tasks.forEach((task) => {
+					if(end.indexOf(task.status) === -1){
+						response.data[k].running_task = true;
+					}
+				})
 			});
 
 			this.$set(this, 'instance_pagination', {
@@ -406,6 +506,7 @@ export default {
 				hypervisor_id: this.$route.query.hypervisor_id
 			});
 
+			this.do_polling();
 		},
 
 		ip_list(instance) {
@@ -419,72 +520,6 @@ export default {
 			return ips.join('<br />');
 		},
 
-		do_polling() {
-			let vm = this;
-			vm.instance_pagination.instances.data.forEach((instance, ik) => {
-				if (instance.tasks.length > 0) {
-					instance.tasks.forEach((task, tk) => {
-						if (vm.initiated.indexOf(task.id) !== -1) {
-							if (task.status === 'failed') {
-								bootbox.alert("Instance " + instance.name + " - " + vm.tasks[task.action] + " " + task.status + "<br /><div class='col-md-12' style='overflow: scroll; height:200px;background-color: #000;'>" + task.message.toString().replace(/\n/g, "<br />") + "</div>");
-								vm.initiated.splice(vm.initiated.indexOf(task.id), 1);
-							}
-						}
-						if (['failed', 'done'].indexOf(task.status) === -1) {
-							vm.poll_tasks.push(task.id);
-							vm.$set(vm.instance_pagination.instances.data[ik], 'running_task', true);
-						}
-					})
-				}
-			});
-			clearInterval(vm.polling);
-			vm.polling = setInterval(() => {
-				vm.update_tasks()
-			}, 10000);
-		},
-
-		async update_tasks() {
-			let vm = this, end = ['done', 'failed'];
-			if (vm.poll_tasks.length >= 1) {
-				let tasks = await vm.$axios.get('/admin/tasks', {
-					params: {
-						tasks: vm.poll_tasks.join(',')
-					}
-				}).catch((error) => {
-
-				});
-				tasks.data.forEach((task) => {
-					vm.instance_pagination.instances.data.forEach((instance, ik) => {
-						if (instance.id === task.instance_id) {
-							vm.poll_tasks.forEach(async (task_id) => {
-								if (task_id === task.id) {
-									if (end.indexOf(task.status) !== -1) {
-										if (task.status === 'failed') {
-											bootbox.alert("Instance " + instance.name + " - " + vm.tasks[task.action] + " " + task.status + "<br /><div class='col-md-12' style='overflow: scroll; height:200px;background-color: #000;'>" + task.message.toString().replace(/\n/g, "<br />") + "</div>");
-										}
-										setTimeout(async () => {
-											let response = await vm.$axios.get('/admin/instances/' + task.instance_id);
-											if (response) {
-												vm.instance_pagination.instances.data[ik].tasks.forEach((domtask, domid) => {
-													if (domtask.id === task_id) {
-														vm.$set(vm.instance_pagination.instances.data[ik].tasks, domid, task);
-														vm.poll_tasks.splice(vm.poll_tasks.indexOf(task_id), 1);
-														vm.$set(vm.instance_pagination.instances.data, ik, response.data);
-														vm.$set(vm.instance_pagination.instances.data[ik], 'running_task', false);
-													}
-												});
-											}
-										}, 20000)
-									}
-								}
-							});
-						}
-					});
-				});
-			} else if (vm.poll_tasks.length <= 0) {
-				clearInterval(vm.polling);
-			}
-		},
 	},
 	async asyncData({$axios, route}) {
 		let hypervisor = [];
@@ -522,7 +557,6 @@ export default {
 			},
 			hypervisor: hypervisor
 		}
-
 	},
 	mounted() {
 		let vm = this;
@@ -566,7 +600,8 @@ export default {
 		}).on('change', function () {
 			vm.$set(vm.filter, "hypervisor_id", this.value);
 		});
-		this.do_polling();
+
+		vm.do_polling();
 	},
 	beforeDestroy() {
 		clearInterval(this.polling);

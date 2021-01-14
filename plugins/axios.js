@@ -38,8 +38,10 @@ export default function({ app, $axios, store, $config: { API_URL } }) {
             return Promise.reject(error);
         }
     });
-
     $axios.onRequest((config) => {
+    	config.httpsAgent = https.Agent({
+			rejectUnauthorized: false,
+		});
         if(['/auth/check'].indexOf(config.url) === -1){
             store.dispatch('clearAlerts',{});
             store.dispatch('clearErrors',{});

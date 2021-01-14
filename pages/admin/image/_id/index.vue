@@ -1,6 +1,6 @@
 <template>
 	<div class="content animated fadeIn">
-		<h2><i class="fa fa-linux" aria-hidden="true"></i> Edit Image</h2>
+		<h2><i class="fab fa-linux" aria-hidden="true"></i> Edit Image</h2>
 		<div class="col-md-10">
 			<div class="box storage">
 				<form @submit.prevent="update">
@@ -46,8 +46,7 @@
 						</div>
 						<div class="col-md-3">
 							<input type="checkbox" name="type" value="public"/>
-							<input type="checkbox" name="type" id="private" value="private"
-								   :checked="image.type === 'private'"/>
+							<input type="checkbox" name="type" id="private" value="private" :checked="image.type === 'private'"/>
 							<label class="switchy" for="private"/>
 						</div>
 					</div>
@@ -94,14 +93,12 @@ export default {
 	mounted() {
 		let vm = this;
 		let distro = [];
-		if (vm.image.distro !== '' && this.$store.state.global.environment.distros[this.image.distro].short_name) {
-			distro.push({
-				id: vm.image.distro,
-				text: this.$store.state.global.environment.distros[this.image.distro].display_name,
-				distro: this.$store.state.global.environment.distros[this.image.distro],
-				selected: true
-			});
-		}
+		distro.push({
+			id: vm.image.distro.id,
+			text: vm.image.distro.display_name,
+			distro: vm.image.distro.short_name,
+			selected: true
+		});
 		$('[name="distro"]').select2({
 			placeholder: 'Select Distro',
 			ajax: {

@@ -3006,6 +3006,9 @@ tbody.collapse.in{
     text-align:left;
     list-style:none;
     background-color:#fff;
+	height: 300px;
+	overflow: hidden;
+	overflow-y: scroll !important;
     -webkit-background-clip:padding-box;
     background-clip:padding-box;
     border:1px solid #ccc;
@@ -3014,6 +3017,7 @@ tbody.collapse.in{
     -webkit-box-shadow:0 6px 12px rgba(0,0,0,.175);
     box-shadow:0 6px 12px rgba(0,0,0,.175)
 }
+
 .dropdown-menu.pull-right{
     right:0;
     left:auto
@@ -8851,4 +8855,21 @@ label.switch:active:after {
 
 .progress-bar.active,.progress.active .progress-bar{
 	background-color: #3D3487;
+}
+
+.dropdown-menu::-webkit-scrollbar {
+	width: 4px;
+	margin-right: -2px;
+}
+
+/* Track */
+.dropdown-menu::-webkit-scrollbar-track {
+	box-shadow: inset 0 0 5px grey;
+	border-radius: 10px;
+}
+
+/* Handle */
+.dropdown-menu::-webkit-scrollbar-thumb {
+	background: #3D3487;
+	border-radius: 10px;
 }

@@ -1,6 +1,6 @@
 <template>
 	<div class="content animated fadeIn email images">
-		<h2><i class="fa fa-file-o" aria-hidden="true"></i> Images Browser</h2>
+		<h2><i class="fa fa-linux" aria-hidden="true"></i> Images Browser</h2>
 		<div class="col-md-10">
 			<div class="box storage">
 				<div class="input-group col-md-3">

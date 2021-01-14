@@ -15,7 +15,7 @@
 				<i aria-hidden="true" class="fa fa-stop"></i> <span>Stop</span>
 			</a>
 			<a :class="{disabled: disableAction || instance_suspended || instance_network_suspended }" data-placement="bottom" data-toggle="tooltip" href="#" title="Restart this server" @click.prevent="action('restart')">
-				<i aria-hidden="true" class="fas fa-redo"></i><span>Restart</span>
+				<i aria-hidden="true" class="fas fa-redo"></i> <span>Restart</span>
 			</a>
 			<a :class="{disabled:  disableAction || instance_stopped }" data-placement="bottom" data-toggle="tooltip" href="#" title="Open console" @click.prevent="novnc">
 				<i aria-hidden="true" class="fa fa-terminal"></i> <span>Console</span>
@@ -187,10 +187,10 @@
 										<div class="col-md-5">
 											<p><b>Disk Driver</b>:</p>
 											<br>
-											<select v-model="instance.disk_driver" class="js-example-basic-single form-control"
-													data-width="100%" name="disk_driver">
-												<option value="default">IDE</option>
+											<select v-model="instance.disk_driver" class="js-example-basic-single form-control" data-width="100%" name="disk_driver">
 												<option value="virtio">Virtio</option>
+												<option value="virtio-scsi">Virtio SCSI</option>
+												<option value="ide">IDE</option>
 												<option value="scsi">SCSI</option>
 											</select>
 											<br><br>

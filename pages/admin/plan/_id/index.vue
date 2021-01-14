@@ -81,7 +81,7 @@
 						<div class="col-md-6">
 							<div class="form-group">
 								<label>Disk Type</label>
-								<select name="disk_type" class="form-control">
+								<select name="disk_type" class="form-control" v-model="plan.disk_type">
 									<option value="any">Any</option>
 									<option value="hdd">HDD</option>
 									<option value="sas">SAS</option>
@@ -97,7 +97,7 @@
 							:class="{'col-md-4': disk_driver === 'virtio-scsi', 'col-md-6': disk_driver !== 'virtio-scsi'}">
 							<div class="form-group">
 								<label> Disk Driver</label>
-								<select name="disk_driver" class="form-control" data-width="100%">
+								<select name="disk_driver" class="form-control" data-width="100%" v-model="plan.disk_driver">
 									<option value="ide">IDE</option>
 									<option value="virtio">Virtio</option>
 									<option value="virtio-scsi">Virtio SCSI</option>
@@ -109,7 +109,7 @@
 							:class="{'col-md-4': disk_driver === 'virtio-scsi', 'col-md-6': disk_driver !== 'virtio-scsi'}">
 							<div class="form-group">
 								<label> Disk Cache</label>
-								<select name="disk_cache" class="form-control" data-width="100%">
+								<select name="disk_cache" class="form-control" data-width="100%" v-model="plan.disk_cache">
 									<option value="none">Default</option>
 									<option value="writethrough">Write Through</option>
 									<option value="writeback">Write Back</option>
@@ -120,7 +120,7 @@
 						<div class="col-md-4" v-show="disk_driver === 'virtio-scsi'">
 							<div class="form-group">
 								<label> Disk Discard</label>
-								<select name="disk_discard" class="form-control" data-width="100%">
+								<select name="disk_discard" class="form-control" data-width="100%" v-model="plan.disk_discard">
 									<option value="none">None</option>
 									<option value="unmap">Unmap</option>
 								</select>
@@ -133,7 +133,7 @@
 						<div class="col-md-6">
 							<div class="form-group">
 								<label>I/O Mode</label>
-								<select name="io_mode" class="form-control">
+								<select name="io_mode" class="form-control" v-model="plan.io_mode">
 									<option value="native">Native</option>
 									<option value="native">Threads</option>
 								</select>
@@ -193,8 +193,7 @@
 									<option value="downloads">Downloads</option>
 									<option value="both">Both</option>
 								</select>
-								<span class="help-block"
-									  v-if="errors.bandwidth_accounting">{{ errors.bandwidth_accounting[0] }}</span>
+								<span class="help-block" v-if="errors.bandwidth_accounting">{{ errors.bandwidth_accounting[0] }}</span>
 							</div>
 						</div>
 					</div>
@@ -208,26 +207,19 @@
 									<option value="suspend_instance">Suspend Instance</option>
 									<option value="billing">Bill Overage</option>
 								</select>
-								<span class="help-block" v-if="errors.bandwidth_overage">{{
-										errors.bandwidth_overage[0]
-									}}</span>
+								<span class="help-block" v-if="errors.bandwidth_overage">{{ errors.bandwidth_overage[0] }}</span>
 							</div>
 						</div>
 						<div class="col-md-6" v-if="bandwidth_overage === 'billing'">
 							<div class="form-group" :class="{'has-error': errors.overage_price}">
 								<label>Bandwidth Overage Price</label>
 								<div class="input-group">
-									<div class="input-group-addon">{{
-											currencySymbol[environment.settings.currency_code]
-										}}
+									<div class="input-group-addon">{{ currencySymbol[environment.settings.currency_code] }}
 									</div>
-									<input type="number" name="overage_price" class="form-control"
-										   :disabled="!enabledBilling" v-model="plan.overage_price">
+									<input type="number" name="overage_price" class="form-control" :disabled="!enabledBilling" v-model="plan.overage_price">
 									<div class="input-group-addon">/GB</div>
 								</div>
-								<span class="help-block" v-if="errors.overage_price">{{
-										errors.overage_price[0]
-									}}</span>
+								<span class="help-block" v-if="errors.overage_price">{{ errors.overage_price[0] }}</span>
 							</div>
 						</div>
 						<div class="col-md-6" v-else>
@@ -255,30 +247,37 @@
 							:class="{'col-md-6': bandwidth_overage !== 'billing', 'col-md-4': bandwidth_overage === 'billing'}">
 							<div class="form-group">
 								<label>IPv6 Subnet Count</label>
-								<input type="number" name="ipv6_subnet_count" class="form-control"
-									   v-model="plan.ipv6_subnet_count">
+								<input type="number" name="ipv6_subnet_count" class="form-control" v-model="plan.ipv6_subnet_count">
 							</div>
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-md-6">
+						<div class="col-md-4">
+							<div class="form-group">
+								<label>Network Driver</label>
+								<select name="nic_type" class="form-control" v-model="plan.nic_type">
+									<option value="virtio">VirtIO</option>
+									<option value="rtl8139">Realtek 8139</option>
+									<option value="e1000">e1000</option>
+								</select>
+							</div>
+						</div>
+						<div class="col-md-4">
 							<div class="form-group">
 								<label>Upload Speed</label>
 								<div class="input-group">
-									<input type="number" name="upload_speed" class="form-control"
-										   v-model="plan.upload_speed">
+									<input type="number" name="upload_speed" class="form-control" v-model="plan.upload_speed">
 									<div class="input-group-addon">
 										Mbit/s
 									</div>
 								</div>
 							</div>
 						</div>
-						<div class="col-md-6">
+						<div class="col-md-4">
 							<div class="form-group">
 								<label>Download Speed</label>
 								<div class="input-group">
-									<input type="number" name="download_speed" class="form-control"
-										   v-model="plan.download_speed">
+									<input type="number" name="download_speed" class="form-control" v-model="plan.download_speed">
 									<div class="input-group-addon">
 										Mbit/s
 									</div>
@@ -291,10 +290,8 @@
 					<div class="row">
 						<div class="col-md-6">
 							<div class="form-group">
-								<label>Regions</label>
-								<select name="regions[]" class="form-control" multiple="multiple" data-width="100%">
-									<option value=""></option>
-								</select>
+								<label>Snapshot Limit</label>
+								<input type="number" name="snapshot_limit" class="form-control" v-model="plan.snapshot_limit">
 							</div>
 						</div>
 						<div class="col-md-6">
@@ -306,6 +303,17 @@
 								</select>
 							</div>
 						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<div class="form-group">
+								<label>Regions</label>
+								<select name="regions[]" class="form-control" multiple="multiple" data-width="100%">
+									<option value=""></option>
+								</select>
+							</div>
+						</div>
+
 					</div>
 					<div class="row">
 						<div class="col-md-6">
@@ -418,6 +426,9 @@ export default {
 		$('[name="disk_driver"]').select2({placeholder: 'Select Driver'}).on('change', function () {
 			vm.$set(vm, 'disk_driver', this.value);
 		}).val(this.plan.disk_driver).trigger('change');
+		$('[name="disk_type"]').select2({placeholder: 'Select Disk Type'}).on('change', function () {
+			vm.$set(vm, 'disk_type', this.value);
+		}).val(this.plan.disk_type).trigger('change');
 		$('[name="io_mode"]').select2({placeholder: 'Select Mode'}).val(this.plan.io_mode).trigger('change');
 		$('[name="disk_cache"]').select2({placeholder: 'Select Cache'}).val(this.plan.disk_cache).trigger('change');
 		$('[name="disk_discard"]').select2({placeholder: 'Select Discard'}).val(this.plan.disk_discard).trigger('change');

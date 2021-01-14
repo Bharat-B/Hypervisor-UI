@@ -28,6 +28,7 @@
 			<div class="col-md-10">
 				<div class="wow fadeIn blocks firewall-manage snapshots" v-if="snapshots.data.length >= 1">
 					<input type="search" placeholder="Search snapshots" v-model="pagination_search" @keyup.enter="search"/>
+					<br><br>
 					<div class="table-responsive">
 						<table class="table snapshotslist">
 							<thead>
@@ -150,10 +151,31 @@ export default {
 		},
 		destroy(id) {
 			let vm = this;
-			vm.$axios.delete('user/snapshot/' + id).then((response) => {
-				vm.search();
-			}).catch((error) => {
+			bootbox.confirm({
+				title: "Are you sure you want to delete this snapshot?",
+				message: "Please note that no further confirmations will appear!",
+				buttons: {
+					confirm: {
+						label: '<i class="fa fa-check"></i>Delete Snapshot',
+						className: 'btn-success'
+					},
+					cancel: {
+						label: 'Cancel',
+						className: 'btn-warning'
+					}
+				},
+				callback: function (result) {
+					if (result) {
+						vm.$axios.delete('user/snapshot/' + id).then((response) => {
+							setTimeout(()=>{
+								vm.search()
+							},2000);
 
+						}).catch((error) => {
+
+						});
+					}
+				}
 			});
 		},
 		update_name(snapshot, index) {

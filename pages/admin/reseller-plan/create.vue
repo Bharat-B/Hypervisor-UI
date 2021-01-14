@@ -221,17 +221,12 @@
 							<div class="form-group" :class="{'has-error': errors.overage_price}">
 								<label>Bandwidth Overage Price</label>
 								<div class="input-group">
-									<div class="input-group-addon">{{
-											currencySymbol[environment.settings.currency_code]
-										}}
-									</div>
+									<div class="input-group-addon">{{ currencySymbol[environment.settings.currency_code] }}</div>
 									<input type="number" name="overage_price" class="form-control"
 										   :disabled="!enabledBilling">
 									<div class="input-group-addon">/GB</div>
 								</div>
-								<span class="help-block" v-if="errors.overage_price">{{
-										errors.overage_price[0]
-									}}</span>
+								<span class="help-block" v-if="errors.overage_price">{{ errors.overage_price[0] }}</span>
 							</div>
 						</div>
 						<div class="col-md-6" v-else>
@@ -240,8 +235,7 @@
 								<input type="number" name="ipv4_count" class="form-control" value="0">
 							</div>
 						</div>
-					</div>
-					<div class="row">
+
 						<div v-if="bandwidth_overage === 'billing'" class="col-md-4">
 							<div class="form-group">
 								<label>IPv4 Count</label>
@@ -290,7 +284,13 @@
 					<br>
 					<h4>Other Settings</h4>
 					<div class="row">
-						<div :class="{'col-md-4': enabledBilling, 'col-md-6': !enabledBilling}">
+						<div class="col-md-6">
+							<div class="form-group">
+								<label>Snapshots Limit</label>
+								<input type="number" name="snapshot_limit" class="form-control" value="0">
+							</div>
+						</div>
+						<div class="col-md-6">
 							<div class="form-group">
 								<label>Regions</label>
 								<select name="regions[]" class="form-control" multiple="multiple" data-width="100%">
@@ -298,7 +298,9 @@
 								</select>
 							</div>
 						</div>
-						<div :class="{'col-md-4': enabledBilling, 'col-md-6': !enabledBilling}">
+					</div>
+					<div class="row">
+						<div class="col-md-6">
 							<div class="form-group">
 								<label>Image Groups</label>
 								<select name="image_groups[]" class="form-control" multiple="multiple"
@@ -307,7 +309,7 @@
 								</select>
 							</div>
 						</div>
-						<div class="col-md-4" v-if="enabledBilling">
+						<div class="col-md-6" v-if="enabledBilling">
 							<div class="form-group" :class="{'has-error': errors.price}">
 								<label>Price</label>
 								<div class="input-group">

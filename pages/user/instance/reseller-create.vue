@@ -69,7 +69,7 @@
 						<h4>Instance - ( {{ instance_limit }} )</h4>
 						<hr>
 						<div class="row">
-							<div class="col-md-4">
+							<div class="col-md-6">
 								<div class="form-group" :class="{'has-error': errors.cpu_cores}">
 									<label> CPU Cores</label>
 									<div class="input-group">
@@ -81,7 +81,7 @@
 									<span class="help-block" v-if="errors.cpu_cores">{{ errors.cpu_cores[0] }}</span>
 								</div>
 							</div>
-							<div class="col-md-4">
+							<div class="col-md-6">
 								<div class="form-group" :class="{'has-error': errors.ram}">
 									<label> RAM (in MB)</label>
 									<div class="input-group">
@@ -93,7 +93,9 @@
 									<span class="help-block" v-if="errors.ram">{{ errors.ram[0] }}</span>
 								</div>
 							</div>
-							<div class="col-md-4">
+						</div>
+						<div class="row">
+							<div class="col-md-6">
 								<div class="form-group" :class="{'has-error': errors.disk_size}">
 									<label> Disk (in GB)</label>
 									<div class="input-group">
@@ -103,6 +105,18 @@
 										</div>
 									</div>
 									<span class="help-block" v-if="errors.disk_size">{{ errors.disk_size[0] }}</span>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group" :class="{'has-error': errors.snapshot_limit}">
+									<label> Snapshot Limit</label>
+									<div class="input-group">
+										<input type="number" name="snapshot_limit" class="form-control input-lg">
+										<div class="input-group-addon">
+											{{ reseller_limits.snapshot_limit }}
+										</div>
+									</div>
+									<span class="help-block" v-if="errors.snapshot_limit">{{ errors.snapshot_limit[0] }}</span>
 								</div>
 							</div>
 						</div>
@@ -120,6 +134,18 @@
 								</div>
 							</div>
 							<div class="col-md-6">
+								<div class="form-group">
+									<label>Network Driver</label>
+									<select name="nic_type" class="form-control">
+										<option value="virtio">VirtIO</option>
+										<option value="rtl8139">Realtek 8139</option>
+										<option value="e1000">e1000</option>
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-4">
 								<div class="form-group" :class="{'has-error': errors.ipv4_count}">
 									<label> IPv4 Addresses</label>
 									<div class="input-group">
@@ -131,9 +157,7 @@
 									<span class="help-block" v-if="errors.ipv4_count">{{ errors.ipv4_count[0] }}</span>
 								</div>
 							</div>
-						</div>
-						<div class="row">
-							<div class="col-md-6">
+							<div class="col-md-4">
 								<div class="form-group" :class="{'has-error': errors.ipv6_count}">
 									<label> IPv6 Addresses</label>
 									<div class="input-group">
@@ -145,7 +169,7 @@
 									<span class="help-block" v-if="errors.ipv6_count">{{ errors.ipv6_count[0] }}</span>
 								</div>
 							</div>
-							<div class="col-md-6">
+							<div class="col-md-4">
 								<div class="form-group" :class="{'has-error': errors.ipv6_subnet_count}">
 									<label> IPv6 Subnets</label>
 									<div class="input-group">
@@ -253,6 +277,7 @@ export default {
 	},
 	mounted() {
 		let vm = this;
+		$('[name="nic_type"]').select2();
 		$('[name="user_id"]').select2({
 			placeholder: 'Select User',
 			allowClear: true,
@@ -282,7 +307,7 @@ export default {
 				cache: true
 			}
 		}).on('change', function () {
-
+			vm.$set(vm,'user_id', this.value);
 		});
 		$('[name="region_id"]').select2({
 			placeholder: 'Select Region',
@@ -323,7 +348,6 @@ export default {
 				);
 			},
 			templateSelection: function (state) {
-				console.log(state);
 				if (!state.id) {
 					return state.text
 				}

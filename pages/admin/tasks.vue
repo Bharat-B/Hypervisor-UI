@@ -29,6 +29,17 @@
 						</select>
 					</div>
 				</div>
+				<div class="row">
+					<div class="pull-left">
+						<div class="col-lg-3" v-if="selected_tasks.length > 0">
+							<button class="btn btn-default" :disabled="processing" @click.prevent="delete_tasks">
+								<i class="fa fa-spin fa-spinner" v-if="processing"></i>
+								<i class="fa fa-trash" v-else></i>
+								Delete
+							</button>
+						</div>
+					</div>
+				</div>
 				<div class="table-responsive">
 					<table class="table text-center">
 						<thead>

@@ -36,14 +36,12 @@
 							<td>{{ plan.bandwidth <= 0 ? 'No Limit' : $Gb2Tb(plan.bandwidth) }}</td>
 							<td>
 								<div>
-									<input type="checkbox" :id="'is_hidden_'+plan.id" v-model="plan.hidden"
-										   @change.prevent="update_hidden(plan)" :checked="plan.hidden === 1"/>
+									<input type="checkbox" :id="'is_hidden_'+plan.id" v-model="plan.hidden" @change.prevent="update_hidden(plan)" :checked="plan.hidden === 1"/>
 									<label class="switchy" :for="'is_hidden_'+plan.id"></label>
 								</div>
 							</td>
 							<td>
-								<span v-if="!plan.editing">{{ plan.sort }} <i class="fas fa-edit" style="cursor:pointer"
-																			  @click.prevent="$set($data.plan_pagination.plans.data[$index],'editing',true)"></i></span>
+								<span v-if="!plan.editing">{{ plan.sort }} <i class="fas fa-edit" style="cursor:pointer" @click.prevent="$set($data.plan_pagination.plans.data[$index],'editing',true)"></i></span>
 								<span v-if="plan.editing">
                                     <div class="col-lg-6">
                                         <div class="input-group">
@@ -62,16 +60,13 @@
 							</td>
 							<td v-if="enabledBilling">{{ $currencyFormat(plan.price) }}</td>
 							<td class="actions">
-								<nuxt-link tag="button" :to="{name: 'admin-plan-create', query: {duplicate: plan.id}}"
-										   class="btn btn-default">
+								<nuxt-link tag="a" :to="{name: 'admin-plan-create', query: {duplicate: plan.id}}" class="btn btn-default">
 									<i class="far fa-copy"></i>
 								</nuxt-link>
-								<nuxt-link tag="button" :to="{name: 'admin-plan-id', params:{id: plan.id}}"
-										   class="btn btn-default"><i class="fa fa-edit" aria-hidden="true"></i>
+								<nuxt-link tag="a" :to="{name: 'admin-plan-id', params:{id: plan.id}}" class="btn btn-default">
+									<i class="fa fa-edit" aria-hidden="true"></i>
 								</nuxt-link>
-								<button class="btn btn-default" @click.prevent="destroy(plan)"><i class="fa fa-trash"
-																								  aria-hidden="true"></i>
-								</button>
+								<button class="btn btn-default" @click.prevent="destroy(plan)"><i class="fa fa-trash" aria-hidden="true"></i></button>
 							</td>
 						</tr>
 						</tbody>

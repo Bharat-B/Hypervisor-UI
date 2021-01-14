@@ -245,7 +245,7 @@ export default {
 					let instances = [];
 					data.data.forEach((instance) => {
 						if (instance.hypervisor_id === vm.source_hypervisor_id) {
-							instances.push({id: instance.id, text: [instance.hostname, instance.primary_ip.ip].join(' - ')});
+							instances.push({id: instance.id, text: [instance.hostname, instance.name].join(' - ')});
 						}
 					});
 					return {

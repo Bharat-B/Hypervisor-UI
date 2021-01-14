@@ -51,11 +51,29 @@
                 	return;
 				}
 
-				vm.$axios.post('/user/snapshot/restore/'+vm.restoresnapshot.id+'/'+vm.instance_id).then((response) => {
-					vm.close();
-					vm.$router.push({name: 'user-instance-id', params: { id: vm.instance_id }, query: { tab: 'settings', subtab: 'tasks' }});
-				}).catch((error) => {
-					vm.close();
+				bootbox.confirm({
+					title: "Are you sure you want to restore this snapshot?",
+					message: "Please note that no further confirmations will appear!",
+					buttons: {
+						confirm: {
+							label: '<i class="fa fa-check"></i>Restore Snapshot',
+							className: 'btn-success'
+						},
+						cancel: {
+							label: 'Cancel',
+							className: 'btn-warning'
+						}
+					},
+					callback: function (result) {
+						if (result) {
+							vm.$axios.post('/user/snapshot/restore/'+vm.restoresnapshot.id+'/'+vm.instance_id).then((response) => {
+								vm.close();
+								vm.$router.push({name: 'user-instance-id', params: { id: vm.instance_id }, query: { tab: 'settings', subtab: 'tasks' }});
+							}).catch((error) => {
+								vm.close();
+							});
+						}
+					}
 				});
 
                 vm.$set(this,'processing',false);

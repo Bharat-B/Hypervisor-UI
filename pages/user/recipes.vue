@@ -31,8 +31,8 @@
 		<div class="dashstuff">
 			<div class="col-md-10">
 				<div class="wow fadeIn blocks firewall-manage recipes" v-if="recipes.data.length >= 1">
-					<input type="search" placeholder="Search Recipes" v-model="pagination_search"
-						   @keyup.enter="search"/>
+					<input type="search" placeholder="Search Recipes" v-model="pagination_search" @keyup.enter="search"/>
+					<br><br>
 					<div class="table-responsive">
 						<table class="table recipeslist">
 							<thead>
@@ -148,10 +148,30 @@ export default {
 		},
 		destroy(id) {
 			let vm = this;
-			vm.$axios.delete('user/recipe/' + id).then((response) => {
-				vm.search();
-			}).catch((error) => {
+			bootbox.confirm({
+				title: "Are you sure you want to delete this recipe?",
+				message: "Please note that no further confirmations will appear!",
+				buttons: {
+					confirm: {
+						label: '<i class="fa fa-check"></i>Delete Recipe',
+						className: 'btn-success'
+					},
+					cancel: {
+						label: 'Cancel',
+						className: 'btn-warning'
+					}
+				},
+				callback: function (result) {
+					if (result) {
+						vm.$axios.delete('user/recipe/' + id).then((response) => {
+							setTimeout(()=>{
+								vm.search()
+							},2000);
+						}).catch((error) => {
 
+						});
+					}
+				}
 			});
 		}
 	}
